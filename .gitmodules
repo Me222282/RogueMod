@@ -1,0 +1,3 @@
+[submodule "deps/Structs"]
+	path = deps/Structs
+	url = https://github.com/Me222282/ZeneStructs.git

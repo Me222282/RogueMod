@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>CursesSharp</RootNamespace>
+    <AssemblyName>CursesSharp</AssemblyName>
+    
+    <Optimize>true</Optimize>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x64</PlatformTarget>
+    <DefineConstants>HAVE_CURSES_MOUSE</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Update="CursesWrapper.so">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>
+      None
+    </ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>
+    <NoWarn>1701;1702;IDE0090</NoWarn>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>
+      None
+    </ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>
+  </PropertyGroup>
+
+</Project>
