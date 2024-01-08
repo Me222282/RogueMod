@@ -9,7 +9,8 @@ namespace RogueMod
         public VirtualScreen(Vector2I size)
         {
             _map = new Unit[size.Y, size.X];
-            _vis = new bool[size.Y, size.X];
+            _map.Fill(new Unit(' '));
+            _vis = new bool[size.Y - 3, size.X];
             Size = size;
         }
         
@@ -27,31 +28,33 @@ namespace RogueMod
                 _vis[y, x] = value;
                 if (!PrintDirect) { return; }
                 
-                Unit u = value ? _map[y, x] : new Unit(' ');
+                Unit u = value ? _map[y + 1, x] : new Unit(' ');
                 Stdscr.Attr = u.Attribute;
                 Stdscr.AddW(u.Character);
             }
         }
+        private bool Visable(int x, int y) => y < 0 || y >= Size.Y - 3 || _vis[y, x];
         
+        // Add 1 to y to leave space for Messages
         public void Write(int x, int y, char ch)
         {
             Unit u = new Unit(ch);
-            _map[y, x] = u;
+            _map[y + 1, x] = u;
             
-            if (!PrintDirect || !_vis[y, x]) { return; }
+            if (!PrintDirect || !Visable(x, y)) { return; }
             
             Stdscr.Attr = u.Attribute;
-            Stdscr.AddW(y, x, u.Character);
+            Stdscr.AddW(y + 1, x, u.Character);
         }
         public void Write(int x, int y, Draw ch)
         {
             Unit u = new Unit(ch);
-            _map[y, x] = u;
+            _map[y + 1, x] = u;
             
-            if (!PrintDirect || !_vis[y, x]) { return; }
+            if (!PrintDirect || !Visable(x, y)) { return; }
             
             Stdscr.Attr = u.Attribute;
-            Stdscr.AddW(y, x, u.Character);
+            Stdscr.AddW(y + 1, x, u.Character);
         }
         public void Write(int x, int y, string str)
         {
@@ -111,14 +114,14 @@ namespace RogueMod
             }
         }
         
-        public char Read(int x, int y) => _map[y, x].Character;
+        public char Read(int x, int y) => _map[y + 1, x].Character;
         
         public void PrintLine(int line)
         {
             Stdscr.Move(line, 0);
             for (int i = 0; i < Size.X; i++)
             {
-                Unit u = _vis[line, i] ? _map[line, i] : new Unit(' ');
+                Unit u = Visable(i, line - 1) ? _map[line, i] : new Unit(' ');
                 Stdscr.Attr = u.Attribute;
                 Stdscr.AddW(u.Character);
             }
@@ -131,7 +134,7 @@ namespace RogueMod
                 
                 for (int x = 0; x < Size.X; x++)
                 {
-                    Unit u = _vis[y, x] ? _map[y, x] : new Unit(' ');
+                    Unit u = Visable(x, y - 1) ? _map[y, x] : new Unit(' ');
                     Stdscr.Attr = u.Attribute;
                     Stdscr.AddW(u.Character);
                 }

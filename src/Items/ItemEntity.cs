@@ -11,13 +11,18 @@ namespace RogueMod
             Position = pos;
             SetGraphic(item.Type);
         }
+        public ItemEntity(IItem item)
+        {
+            Item = item;
+            SetGraphic(item.Type);
+        }
         
         public IItem Item { get; }
         
         public Vector2I Position { get; set; }
         public char Graphic { get; private set; }
         public char UnderChar { get; set; }
-        public bool Seen { get; set; }
+        public bool Seen { get; set; } = false;
         
         private void SetGraphic(ItemType type)
         {

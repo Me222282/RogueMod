@@ -34,7 +34,6 @@ namespace RogueMod
         {
             list.AddLast(new LinkedListNode<T>(value));
         }
-        
         public static bool Exists<T>(this IEnumerable<T> e, Predicate<T> test)
         {
             foreach (T t in e)
@@ -43,6 +42,18 @@ namespace RogueMod
                 return true;
             }
             return false;
+        }
+        public static void Fill<T>(this T[,] array, T value)
+        {
+            int w = array.GetLength(1);
+            int h = array.GetLength(0);
+            for (int j = 0; j < h; j++)
+            {
+                for (int i = 0; i < w; i++)
+                {
+                    array[j, i] = value;
+                }
+            }
         }
     }
 }

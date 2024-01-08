@@ -19,7 +19,7 @@ namespace RogueMod
         public LinkedList<IEntity> Entities { get; } = new LinkedList<IEntity>();
         public Door[] Doors { get; }
         
-        public void Render(VirtualScreen scr)
+        public void Render(VirtualScreen scr, bool viewEntities)
         {
             scr.RenderBoxD(Bounds);
             
@@ -32,7 +32,7 @@ namespace RogueMod
                 Bounds.Width - 2, Bounds.Height - 2,
                 (char)Draw.Floor);
             
-            if (PlayerInRoom)
+            if (viewEntities)
             {
                 foreach (IEntity e in Entities)
                 {
@@ -42,23 +42,33 @@ namespace RogueMod
         }
         public void Enter(IEntity entity)
         {
-            if (entity is Player)
-            {
-                PlayerInRoom = true;
-            }
-            else if (entity is ItemEntity)
+            if (entity is ItemEntity)
             {
                 entity.Position = GetNextPosition();
             }
             Entities.Add(entity);
         }
-        public void Leave(IEntity entity)
+        public void Leave(IEntity entity) => Entities.Remove(entity);
+        
+        public Vector2I GetDoor(int index)
         {
-            Entities.Remove(entity);
-            if (entity is Player)
+            Door d = Doors[index];
+            int x = 0;
+            int y = 0;
+            if (d.Vertical)
             {
-                PlayerInRoom = false;
+                y = d.Location;
             }
+            else
+            {
+                x = d.Location;
+            }
+            return Bounds.Location + (x, y);
+        }
+        public bool OnBoundary(int x, int y)
+        {
+            return x == Bounds.X || x == Bounds.Right ||
+                y == Bounds.Y || y == (Bounds.Y + Bounds.Height);
         }
         
         public Vector2I GetNextPosition()
@@ -66,14 +76,15 @@ namespace RogueMod
             RectangleI innerBounds = new RectangleI(
                 Bounds.X + 1,
                 Bounds.Y + 1,
-                Bounds.Width - 2,
-                Bounds.Height - 2);
+                Bounds.Width - 1,
+                Bounds.Height - 1);
             int x = 0, y = 0;
-            while (Entities.Exists(e => e.Position.X == x && e.Position.Y == y))
+            do
             {
                 x = Program.RNG.Next(innerBounds.Left, innerBounds.Right);
                 y = Program.RNG.Next(innerBounds.Top, innerBounds.Y + innerBounds.Height);
             }
+            while (Entities.Exists(e => e.Position.X == x && e.Position.Y == y));
             
             return (x, y);
         }

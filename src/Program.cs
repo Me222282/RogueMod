@@ -25,16 +25,15 @@ namespace RogueMod
             Out.InitColours();
             Stdscr.Clear();
             
-            Rogue game = new Rogue(Properties.Size);
-            
             Splash();
             
-            game.GenRooms(1);
-            game.Rooms[0].Entities.Add(new ItemEntity(Ring.Create(), (5, 5)));
+            Rogue game = new Rogue(Properties.Size);
+            game.RoomManager.Rooms[0].Enter(new ItemEntity(Ring.Create()));
             
             game.Render();
             
             Curtain(game);
+            game.Out.PrintDirect = true;
             
             while (true)
             {
@@ -104,13 +103,13 @@ namespace RogueMod
                     Out.ColourNormal();
                     Stdscr.Clear();
                     PrintList(_controlVisual, 37);
-                    game.Render();
+                    game.Out.Print();
                     return;
                 case (Keys.F0 + 2):
                     Out.ColourNormal();
                     Stdscr.Clear();
                     PrintList(_symbolVisual, 37);
-                    game.Render();
+                    game.Out.Print();
                     return;
                 case (Keys.F0 + 3):
                 case 'a':
