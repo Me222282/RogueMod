@@ -115,6 +115,16 @@ namespace RogueMod
                 case 'a':
                     ManageKeyInput(_lastAction, game);
                     return;
+                case Keys.UP:
+                case Keys.DOWN:
+                case Keys.LEFT:
+                case Keys.RIGHT:
+                case Keys.PPAGE:
+                case Keys.NPAGE:
+                case Keys.END:
+                case Keys.HOME:
+                    game.TryMovePlayer((Direction)ch);
+                    return;
             }
         }
         

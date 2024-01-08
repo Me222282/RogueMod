@@ -30,11 +30,16 @@ namespace RogueMod
         private void FillMap(int roomIndex)
         {
             Room r = Rooms[roomIndex];
+            RectangleI innerBounds = new RectangleI(
+                r.Bounds.X + 1,
+                r.Bounds.Y + 1,
+                r.Bounds.Width - 2,
+                r.Bounds.Height - 2);
             
             roomIndex++;
-            for (int y = r.Bounds.Y; y < (r.Bounds.Y + r.Bounds.Height); y++)
+            for (int y = innerBounds.Y; y < (innerBounds.Y + innerBounds.Height); y++)
             {
-                for (int x = r.Bounds.X; x < r.Bounds.Right; x++)
+                for (int x = innerBounds.X; x < innerBounds.Right; x++)
                 {
                     _roomMap[y, x] = roomIndex;
                 }

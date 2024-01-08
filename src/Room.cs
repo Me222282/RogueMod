@@ -76,8 +76,8 @@ namespace RogueMod
             RectangleI innerBounds = new RectangleI(
                 Bounds.X + 1,
                 Bounds.Y + 1,
-                Bounds.Width - 1,
-                Bounds.Height - 1);
+                Bounds.Width - 2,
+                Bounds.Height - 2);
             int x = 0, y = 0;
             do
             {
