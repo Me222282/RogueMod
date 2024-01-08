@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using CursesSharp;
 
@@ -32,6 +33,16 @@ namespace RogueMod
         public static void Add<T>(this LinkedList<T> list, T value)
         {
             list.AddLast(new LinkedListNode<T>(value));
+        }
+        
+        public static bool Exists<T>(this IEnumerable<T> e, Predicate<T> test)
+        {
+            foreach (T t in e)
+            {
+                if (!test(t)) { continue; }
+                return true;
+            }
+            return false;
         }
     }
 }

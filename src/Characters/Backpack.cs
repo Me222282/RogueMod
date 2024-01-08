@@ -13,6 +13,8 @@ namespace RogueMod
         
         public int BackpackSize { get; }
         
+        public int Gold { get; set; }
+        
         private ItemList _holding;
         
         public IItem Weilding { get; private set; }
