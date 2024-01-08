@@ -17,29 +17,24 @@ namespace RogueMod
         public LinkedList<IEntity> Entities { get; } = new LinkedList<IEntity>();
         public Door[] Doors { get; }
         
-        public void Render(bool inRoom)
+        public void Render(bool inRoom, VirtualScreen scr)
         {
-            Out.RenderBoxD(Bounds);
+            scr.RenderBoxD(Bounds);
             
             for (int i = 0; i < Doors.Length; i++)
             {
-                Doors[i].Draw(this);
+                Doors[i].Draw(this, scr);
             }
             
-            if (!Dark)
-            {
-                Out.Fill(Bounds.X + 1, Bounds.Y + 1,
-                    Bounds.Width - 2, Bounds.Height - 2,
-                    (char)Draw.Floor, true);
-            }
+            scr.Fill(Bounds.X + 1, Bounds.Y + 1,
+                Bounds.Width - 2, Bounds.Height - 2,
+                (char)Draw.Floor);
             
             if (inRoom)
             {
                 foreach (IEntity e in Entities)
                 {
-                    if (!e.Seen && Dark) { continue; }
-                    e.Seen = true;
-                    e.Draw();
+                    e.Draw(scr);
                 }
             }
         }

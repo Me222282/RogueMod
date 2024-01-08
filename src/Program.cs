@@ -8,6 +8,7 @@ namespace RogueMod
     {
         public static Random RNG = new Random();
         public static MessageManager Message = new MessageManager();
+        public static Properties Properties;
         
         private static void Main(string[] args)
         {
@@ -18,18 +19,22 @@ namespace RogueMod
             Stdscr.Keypad = true;
             Stdscr.Blocking = true;
             
+            Properties = new Properties();
+            
+            Out.Init(Properties.Size);
             Out.InitColours();
             Stdscr.Clear();
             
-            Rogue game = new Rogue((80, 25));
+            Rogue game = new Rogue(Properties.Size);
             
-            Curses.ResizeTerm(game.PlayingSize.Y + 1, game.PlayingSize.X);
-            Curses.FlushInput();
-            
-            Splash(game.PlayingSize);
+            Splash();
             
             game.GenRooms(1);
             game.Rooms[0].Entities.Add(new ItemEntity(Ring.Create(), (5, 5)));
+            
+            game.Render();
+            
+            Curtain(game);
             
             while (true)
             {
@@ -98,13 +103,13 @@ namespace RogueMod
                 case (Keys.F0 + 1):
                     Out.ColourNormal();
                     Stdscr.Clear();
-                    PrintList(game, _controlVisual, 37);
+                    PrintList(_controlVisual, 37);
                     game.Render();
                     return;
                 case (Keys.F0 + 2):
                     Out.ColourNormal();
                     Stdscr.Clear();
-                    PrintList(game, _symbolVisual, 37);
+                    PrintList(_symbolVisual, 37);
                     game.Render();
                     return;
                 case (Keys.F0 + 3):
@@ -208,9 +213,9 @@ namespace RogueMod
             $"{(char)Draw.Magic},{(char)Draw.MagicB}: safe and perilous magic",
             "A-Z: 26 different monsters"
         };
-        private static void PrintList(Rogue game, string[] list, int minX)
+        private static void PrintList(string[] list, int minX)
         {
-            int hw = game.PlayingSize.X / 2;
+            int hw = Out.Width / 2;
             bool vertical = hw < minX;
             for (int i = 0, j = 0; j < list.Length; i++, j++)
             {
@@ -222,9 +227,9 @@ namespace RogueMod
                     y = i / 2;
                 }
                 
-                if (y >= (game.PlayingSize.Y - 2))
+                if (y >= (Out.Height - 2))
                 {
-                    Stdscr.Add(game.PlayingSize.Y - 1, 0, "--Press space for more, Esc to continue--");
+                    Stdscr.Add(Out.Height - 1, 0, "--Press space for more, Esc to continue--");
                     while (true)
                     {
                         int ch = Stdscr.GetChar();
@@ -241,7 +246,7 @@ namespace RogueMod
                 Out.Write(x, y, list[j], true);
             }
             
-            Stdscr.Add(game.PlayingSize.Y - 1, 0, "--Press space to continue--");
+            Stdscr.Add(Out.Height - 1, 0, "--Press space to continue--");
             int sp;
             do
             {
@@ -249,9 +254,9 @@ namespace RogueMod
             } while (sp != ' ' && sp != Keys.ESC);
         }
         
-        private static string Splash(Vector2I pl)
+        private static string Splash()
         {   
-            Out.RenderBoxD(0, 0, pl.X, pl.Y);
+            Out.RenderBoxD(0, 0, Out.Width, Out.Height);
             
             Out.SetColour(Colours.Normal, true);
             Out.Centre(2, "ROGUE:  The Adventure Game");
@@ -276,7 +281,7 @@ namespace RogueMod
             
             Out.SetColour(Colours.Brown);
             Stdscr.AddW(22, 0, '╠');
-            Out.RenderLineH(1, 22, (char)Draw.WallH, pl.X - 2);
+            Out.RenderLineH(1, 22, (char)Draw.WallH, Out.Width - 2);
             Stdscr.AddW('╣');
             Stdscr.Standend();
             
@@ -291,22 +296,32 @@ namespace RogueMod
             Curses.CursorVisibility = 0;
             return name;
         }
-        private static void Curtain(Vector2I pl)
+        private static void Curtain(Rogue game)
         {
-            int delay = 1500 / pl.Y;
+            int delay = Properties.CurtainTime / Out.Height;
             
-            Out.SetColour(Colours.Green);
-            Out.RenderBoxS(0, 0, pl.X, pl.Y);
+            Out.RenderBoxS(0, 0, Out.Width, Out.Height);
             Stdscr.Refresh();
             Curses.NapMs(delay);
             
-            for (int l = 1; l < pl.Y; l++)
+            // Lower curtain
+            Out.SetColour(Colours.Yellow);
+            for (int l = 1; l < Out.Height - 1; l++)
             {
-                Out.RenderLineH(1, l, (char)Draw.Passage, pl.X - 1);
+                Out.RenderLineH(1, l, (char)Draw.Passage, Out.Width - 2);
                 Stdscr.Refresh();
                 Curses.NapMs(delay);
             }
             Curses.NapMs(delay);
+            
+            // Raise curtain
+            
+            for (int l = Out.Height - 1; l >= 0; l--)
+            {
+                game.Out.PrintLine(l);
+                Stdscr.Refresh();
+                Curses.NapMs(delay);
+            }
         }
     }
 }

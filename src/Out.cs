@@ -53,6 +53,20 @@ namespace RogueMod
     
     public static class Out
     {
+        public static void Init(Vector2I size)
+        {
+            Curses.ResizeTerm(size.Y + 1, size.X);
+            Curses.FlushInput();
+            
+            Width = size.X;
+            Height = size.Y;
+            Size = size;
+        }
+        
+        public static Vector2I Size { get; private set; }
+        public static int Width { get; private set; }
+        public static int Height { get; private set; }
+        
         private static ColourF GetColour(int i)
         {
             return new ColourF(
@@ -200,7 +214,7 @@ namespace RogueMod
             => RenderBoxD(bounds.X, bounds.Y, bounds.Width, bounds.Height);
         public static void RenderBoxS(int x, int y, int w, int h)
         {
-            SetColour(Colours.Brown);
+            SetColour(Colours.Green);
             Stdscr.AddW(y, x, '┌');
             RenderLineH(x + 1, y, '─', w - 2);
             Stdscr.AddW('┐');

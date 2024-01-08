@@ -11,7 +11,7 @@ namespace RogueMod
         public int Location { get; set; }
         public bool Vertical { get; set; }
         
-        public void Draw(Room room)
+        public void Draw(Room room, VirtualScreen scr)
         {
             int x = 0;
             int y = 0;
@@ -23,7 +23,7 @@ namespace RogueMod
             {
                 x = Location;
             }
-            Out.Write(x + room.Bounds.X, y + room.Bounds.Y, (char)RogueMod.Draw.Door, true);
+            scr.Write(x + room.Bounds.X, y + room.Bounds.Y, (char)RogueMod.Draw.Door);
         }
     }
 }

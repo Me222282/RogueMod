@@ -22,11 +22,11 @@ namespace RogueMod
         
         public static char RndChar(this string str) => str[Program.RNG.Next(str.Length)];
         
-        public static void Draw(this IEntity e)
+        public static void Draw(this IEntity e, VirtualScreen scr)
         {
-            e.UnderChar = Curses.StdScr.ReadOutputCharW(e.Position.X, e.Position.Y);
+            e.UnderChar = scr.Read(e.Position.X, e.Position.Y);
             
-            Out.Write(e.Position.X, e.Position.Y, e.Graphic, true);
+            scr.Write(e.Position.X, e.Position.Y, e.Graphic);
         }
     
         public static void Add<T>(this LinkedList<T> list, T value)

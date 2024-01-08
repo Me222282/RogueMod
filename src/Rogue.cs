@@ -7,8 +7,11 @@ namespace RogueMod
     {
         public Rogue(Vector2I size)
         {
-            PlayingSize = size;
+            PlayingSize = size - (0, 3);
+            Out = new VirtualScreen(size);
         }
+        
+        public VirtualScreen Out { get; }
         
         public Vector2I PlayingSize { get; }
         public string PlayerName { get; set; } = "";
@@ -23,7 +26,7 @@ namespace RogueMod
             Stdscr.Clear();
             for (int i = 0; i < Rooms.Length; i++)
             {
-                Rooms[i].Render(true);
+                Rooms[i].Render(true, Out);
             }
         }
         
