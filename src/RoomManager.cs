@@ -22,7 +22,7 @@ namespace RogueMod
         {
             Rooms = new Room[]
             {
-                new Room(new RectangleI(2, 2, 10, 10), false,
+                new Room(new RectangleI(2, 2, 10, 10), true,
                     new Door[] { new Door(4, false), new Door(3, true) })
             };
             FillMap(0);
@@ -83,7 +83,7 @@ namespace RogueMod
             if (v > 0)
             {
                 Room r = Rooms[v - 1];
-                return r.Dark && !r.OnBoundary(x, y);
+                return r.Dark && !r.OnBoundary(x, y) && !r.SeeEntity(x, y);
             }
             return false;
         }

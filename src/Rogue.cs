@@ -31,7 +31,9 @@ namespace RogueMod
             Room playerRoom = RoomManager.GetRandomRoom();
             Player.Position = playerRoom.GetNextPosition();
             playerRoom.Entities.Add(Player);
-            PlayerInRoom(playerRoom);
+            Eluminate(Player.Position.X, Player.Position.Y, true);
+            CurrentRoom = playerRoom;
+            Eluminate(playerRoom);
         }
         
         public VirtualScreen Out { get; }
@@ -89,20 +91,29 @@ namespace RogueMod
             bool success = RoomManager.TryMoveEntity(x, y, Player, out Room newRoom);
             if (!success) { return false; }
             
+            // Move player glyph
+            Out.Write(oldPos.X, oldPos.Y, Player.UnderChar);
+            Player.UnderChar = Out.Read(x, y);
+            Out.Write(x, y, Player.Graphic);
+            
             if (CurrentRoom != null && CurrentRoom.Dark)
             {
                 Eluminate(oldPos.X, oldPos.Y, false);
             }
-            if (newRoom == null || newRoom.Dark)
+            // Eluminate new position - always incase standing in doorway
+            Eluminate(x, y, true);
+            
+            if (CurrentRoom != newRoom)
             {
-                Eluminate(x, y, true);
+                // Render old room without entities
+                CurrentRoom.RenderEntites(Out, false);
+                
+                CurrentRoom = newRoom;
+                Eluminate(newRoom);
+                
+                // Render new room with entites
+                newRoom.RenderEntites(Out, true);
             }
-            
-            PlayerInRoom(newRoom);
-            
-            Out.Write(oldPos.X, oldPos.Y, Player.UnderChar);
-            Player.UnderChar = Out.Read(x, y);
-            Out.Write(x, y, Player.Graphic);
             
             return true;
         }
@@ -111,18 +122,32 @@ namespace RogueMod
         {
             int max1 = Math.Min(PlayingSize.Y - 1, y + 1);
             int max2 = Math.Min(PlayingSize.X - 1, x + 1);
-            for (int i1 = Math.Max(0, y - 1); i1 < max1; i1++)
+            for (int i1 = Math.Max(0, y - 1); i1 <= max1; i1++)
             {
-                for (int i2 = Math.Max(0, x - 1); i2 < max2; i2++)
+                for (int i2 = Math.Max(0, x - 1); i2 <= max2; i2++)
                 {
-                    this.Out[i1, i2] = !(!value && RoomManager.Eluminatable(i1, i2));
+                    Out[i2, i1] = !(!value && RoomManager.Eluminatable(i2, i1));
                 }
             }
         }
-        private void PlayerInRoom(Room room)
+        public void Eluminate(Room room)
         {
-            if (CurrentRoom == room) { return; }
-            CurrentRoom = room;
+            if (room.Dark)
+            {
+                // Show previously seen entities
+                foreach (IEntity e in room.Entities)
+                {
+                    if (!e.Seen) { continue; }
+                    Out[e.Position.X, e.Position.Y] = true;
+                }
+                return;
+            }
+            
+            // All entities have now been seen
+            foreach (IEntity e in room.Entities)
+            {
+                e.Seen = true;
+            }
             
             // Eluminate room
             for (int y = room.Bounds.Y; y < (room.Bounds.Y + room.Bounds.Height); y++)

@@ -125,6 +125,10 @@ namespace RogueMod
                 case Keys.HOME:
                     game.TryMovePlayer((Direction)ch);
                     return;
+                case 'l':
+                    game.CurrentRoom.Dark = false;
+                    game.Eluminate(game.CurrentRoom);
+                    return;
             }
         }
         

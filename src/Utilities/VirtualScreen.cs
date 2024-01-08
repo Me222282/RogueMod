@@ -30,7 +30,7 @@ namespace RogueMod
                 
                 Unit u = value ? _map[y + 1, x] : new Unit(' ');
                 Stdscr.Attr = u.Attribute;
-                Stdscr.AddW(u.Character);
+                Stdscr.AddW(y + 1, x, u.Character);
             }
         }
         private bool Visable(int x, int y) => y < 0 || y >= Size.Y - 3 || _vis[y, x];

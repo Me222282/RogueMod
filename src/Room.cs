@@ -8,6 +8,7 @@ namespace RogueMod
         public Room(RectangleI bounds, bool dark, Door[] doors)
         {
             Bounds = bounds;
+            Dark = dark;
             Doors = doors;
         }
         
@@ -34,15 +35,28 @@ namespace RogueMod
             
             if (viewEntities)
             {
+                RenderEntites(scr, true);
+            }
+        }
+        public void RenderEntites(VirtualScreen scr, bool visible)
+        {
+            if (visible)
+            {
                 foreach (IEntity e in Entities)
                 {
                     e.Draw(scr);
                 }
+                return;
+            }
+            
+            foreach (IEntity e in Entities)
+            {
+                scr.Write(e.Position.X, e.Position.Y, Draw.Floor);
             }
         }
         public void Enter(IEntity entity)
         {
-            if (entity is ItemEntity)
+            if (entity is ItemEntity || entity is Gold)
             {
                 entity.Position = GetNextPosition();
             }
@@ -70,6 +84,18 @@ namespace RogueMod
             return x == Bounds.X || x == Bounds.Right ||
                 y == Bounds.Y || y == (Bounds.Y + Bounds.Height);
         }
+        public bool IsEntity(int x, int y)
+            => Entities.Exists(e => e.Position.X == x && e.Position.Y == y);
+        public bool SeeEntity(int x, int y)
+        {
+            foreach (IEntity e in Entities)
+            {
+                if (e.Position.X != x || e.Position.Y != y) { continue; }
+                e.Seen = true;
+                return true;
+            }
+            return false;
+        }
         
         public Vector2I GetNextPosition()
         {
@@ -84,7 +110,7 @@ namespace RogueMod
                 x = Program.RNG.Next(innerBounds.Left, innerBounds.Right);
                 y = Program.RNG.Next(innerBounds.Top, innerBounds.Y + innerBounds.Height);
             }
-            while (Entities.Exists(e => e.Position.X == x && e.Position.Y == y));
+            while (IsEntity(x, y));
             
             return (x, y);
         }
