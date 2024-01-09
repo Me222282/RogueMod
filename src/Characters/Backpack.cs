@@ -29,6 +29,7 @@ namespace RogueMod
         public bool IsRightRing => RightRing is not null;
         
         public bool IsFull => _holding.Length == _holding.Capacity;
+        public bool IsEmpty => _holding.Length == 0;
         
         public IItem this[char select] => _holding[select];
         public bool this[IItem item] => _holding[item];
@@ -79,7 +80,7 @@ namespace RogueMod
         public bool Add(IItem item) => _holding.Add(item);
         public bool Remove(IItem item) => _holding.Remove(item);
         
-        private string Vowels(string next)
+        private static string Vowels(string next)
         {
             switch (next[0])
             {
@@ -88,37 +89,40 @@ namespace RogueMod
                 case 'i': case 'I':
                 case 'o': case 'O':
                 case 'u': case 'U':
-                    return "An ";
+                    return "An";
                 
                 default:
-                    return "A ";
+                    return "A";
             }
         }
-        public void PrintItemList(Rogue game)
+        public string[] GetItemList(Rogue game)
         {
+            string[] l = new string[_holding.Length];
+            
             char a = 'a';
             foreach (IItem item in _holding)
             {
-                Stdscr.Move(a - 'a', 0);
-                PrintItem(item, game, a);
+                l[a - 'a'] = $"{a}) {GetItemString(item, game)}";
                 a++;
             }
+            
+            return l;
         }
-        private void PrintItem(IItem item, Rogue game, char a)
+        private string GetItemString(IItem item, Rogue game)
         {
             bool pl = item.Quantity > 1;
             string value = item.ToString(game, pl);
             
-            Stdscr.Add(a);
-            Stdscr.Add(" ) ");
             if (item.Type != ItemType.Amulet)
             {
-                Stdscr.Add(pl ? $"{item.Quantity} " : Vowels(value));
+                return pl ? $"{item.Quantity} {value}" : $"{Vowels(value)} {value}";
             }
-            Stdscr.Add(value);
+            return value;
         }
-        public void PrintFilteredItemList(Rogue game, ItemType type)
+        public string[] GetFilteredItemList(Rogue game, ItemType type)
         {
+            string[] l = new string[_holding.Length];
+            
             char a = 'a';
             foreach (IItem item in _holding)
             {
@@ -128,12 +132,16 @@ namespace RogueMod
                     continue;
                 }
                 
-                PrintItem(item, game, a);
+                l[a - 'a'] = $"{a} ) {GetItemString(item, game)}";
                 a++;
             }
+            
+            return l;
         }
-        public void PrintFilteredItemList(Rogue game, Func<IItem, bool> filter)
+        public string[] GetFilteredItemList(Rogue game, Func<IItem, bool> filter)
         {
+            string[] l = new string[_holding.Length];
+            
             char a = 'a';
             foreach (IItem item in _holding)
             {
@@ -143,9 +151,11 @@ namespace RogueMod
                     continue;
                 }
                 
-                PrintItem(item, game, a);
+                l[a - 'a'] = $"{a} ) {GetItemString(item, game)}";
                 a++;
             }
+            
+            return l;
         }
     }
 }

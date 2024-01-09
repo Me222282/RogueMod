@@ -82,6 +82,7 @@ namespace RogueMod
             {
                 _first = new Node(item, null);
                 _last = _first;
+                Length++;
                 return true;
             }
             if (item.Stackable && n.Item.Equals(item))
@@ -150,8 +151,8 @@ namespace RogueMod
         {
             public Enumerator(Node first)
             {
-                _current = first;
-                _start = first;
+                _current = new Node(null, first);
+                _start = _current;
             }
             
             private Node _current;

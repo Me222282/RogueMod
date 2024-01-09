@@ -73,7 +73,7 @@ namespace RogueMod
             }
             
             string playerName = game.Discoveries.StickNames[(int)ScrollType];
-            if (playerName != null || playerName != "")
+            if (playerName != null && playerName != "")
             {
                 return $"scroll{p} called {playerName}";
             }

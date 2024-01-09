@@ -74,7 +74,7 @@ namespace RogueMod
             }
             
             string playerName = game.Discoveries.StickNames[(int)StaffType];
-            if (playerName != null || playerName != "")
+            if (playerName != null && playerName != "")
             {
                 return $"{made}{p} called {playerName}";
             }

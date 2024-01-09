@@ -74,7 +74,7 @@ namespace RogueMod
             }
             
             string playerName = game.Discoveries.RingNames[(int)RingType];
-            if (playerName != null || playerName != "")
+            if (playerName != null && playerName != "")
             {
                 return $"ring{p} called {playerName}";
             }

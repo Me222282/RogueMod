@@ -71,7 +71,7 @@ namespace RogueMod
             }
             
             string playerName = game.Discoveries.PotionNames[(int)PotionType];
-            if (playerName != null || playerName != "")
+            if (playerName != null && playerName != "")
             {
                 return $"potion{p} called {playerName}({name})";
             }

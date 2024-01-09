@@ -100,15 +100,23 @@ namespace RogueMod
                     Message.PushLastMessage();
                     return;
                 case (Keys.F0 + 1):
-                    Out.ColourNormal();
                     Stdscr.Clear();
-                    Out.PrintList(_controlVisual, Out.Width < 37, Out.DefaultOnChar);
+                    Out.PrintList(_controlVisual, (Out.Width / 2) < 37, Out.DefaultOnChar);
                     game.Out.Print();
                     return;
                 case (Keys.F0 + 2):
-                    Out.ColourNormal();
                     Stdscr.Clear();
-                    Out.PrintList(_symbolVisual, Out.Width < 37, Out.DefaultOnChar);
+                    Out.PrintList(_symbolVisual, (Out.Width / 2) < 37, Out.DefaultOnChar);
+                    game.Out.Print();
+                    return;
+                case 'i':
+                    if (game.Player.Backpack.IsEmpty)
+                    {
+                        Message.Push("You are empty handed");
+                        return;
+                    }
+                    Stdscr.Clear();
+                    Out.PrintList(game.Player.Backpack.GetItemList(game), true, Out.DefaultOnChar);
                     game.Out.Print();
                     return;
                 case (Keys.F0 + 3):
