@@ -102,13 +102,13 @@ namespace RogueMod
                 case (Keys.F0 + 1):
                     Out.ColourNormal();
                     Stdscr.Clear();
-                    PrintList(_controlVisual, 37);
+                    Out.PrintList(_controlVisual, Out.Width < 37, Out.DefaultOnChar);
                     game.Out.Print();
                     return;
                 case (Keys.F0 + 2):
                     Out.ColourNormal();
                     Stdscr.Clear();
-                    PrintList(_symbolVisual, 37);
+                    Out.PrintList(_symbolVisual, Out.Width < 37, Out.DefaultOnChar);
                     game.Out.Print();
                     return;
                 case (Keys.F0 + 3):
@@ -226,46 +226,6 @@ namespace RogueMod
             $"{(char)Draw.Magic},{(char)Draw.MagicB}: safe and perilous magic",
             "A-Z: 26 different monsters"
         };
-        private static void PrintList(string[] list, int minX)
-        {
-            int hw = Out.Width / 2;
-            bool vertical = hw < minX;
-            for (int i = 0, j = 0; j < list.Length; i++, j++)
-            {
-                int x = 0;
-                int y = i;
-                if (!vertical)
-                {
-                    x = i % 2 == 0 ? 0 : hw;
-                    y = i / 2;
-                }
-                
-                if (y >= (Out.Height - 2))
-                {
-                    Stdscr.Add(Out.Height - 1, 0, "--Press space for more, Esc to continue--");
-                    while (true)
-                    {
-                        int ch = Stdscr.GetChar();
-                        if (ch == Keys.ESC) { return; }
-                        if (ch != ' ') { continue; }
-                        break;
-                    }
-                    Stdscr.Clear();
-                    i = -1;
-                    j--;
-                    continue;
-                }
-                
-                Out.Write(x, y, list[j], true);
-            }
-            
-            Stdscr.Add(Out.Height - 1, 0, "--Press space to continue--");
-            int sp;
-            do
-            {
-                sp = Stdscr.GetChar();
-            } while (sp != ' ' && sp != Keys.ESC);
-        }
         
         private static string Splash()
         {   

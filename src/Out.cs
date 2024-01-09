@@ -259,5 +259,59 @@ namespace RogueMod
                 RenderLineH(x, y + i, ch, w, colour);
             }
         }
+        
+        public enum Return
+        {
+            Continue,
+            Break,
+            Return
+        }
+        public delegate Return OnChar(int ch);
+        public static OnChar DefaultOnChar =>
+            ch => ch switch
+            {
+                Keys.ESC => Return.Return,
+                ' ' => Return.Break,
+                _ => Return.Continue
+            };
+        public static void PrintList(string[] list, bool vertical, OnChar manager)
+        {
+            int hw = Width / 2;
+            for (int i = 0, j = 0; j < list.Length; i++, j++)
+            {
+                int x = 0;
+                int y = i;
+                if (!vertical)
+                {
+                    x = i % 2 == 0 ? 0 : hw;
+                    y = i / 2;
+                }
+                
+                if (y >= (Height - 2))
+                {
+                    Stdscr.Add(Height - 1, 0, "--Press space for more, Esc to continue--");
+                    while (true)
+                    {
+                        Return r = manager(Stdscr.GetChar());
+                        if (r == Return.Return) { return; }
+                        if (r == Return.Continue) { continue; }
+                        break;
+                    }
+                    Stdscr.Clear();
+                    i = -1;
+                    j--;
+                    continue;
+                }
+                
+                Write(x, y, list[j], true);
+            }
+            
+            Stdscr.Add(Height - 1, 0, "--Press space to continue--");
+            Return sp;
+            do
+            {
+                sp = manager(Stdscr.GetChar());
+            } while (sp == Return.Continue);
+        }
     }
 }
