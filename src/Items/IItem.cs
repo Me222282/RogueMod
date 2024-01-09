@@ -29,7 +29,7 @@ namespace RogueMod
         public bool IsKnown(Rogue game);
         public void MakeKnown(Rogue game);
         
-        public void Effect(Character character, Stats tStats, Rogue game);
+        public void Effect(ICharacter character, Stats tStats, Rogue game);
         public string ToString(Rogue game, bool plural);
         
         public class Comparer : IComparer<IItem>

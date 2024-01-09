@@ -29,7 +29,11 @@ namespace RogueMod
             
             scr.Write(e.Position.X, e.Position.Y, e.Graphic);
         }
-    
+        public static void UnDraw(this IEntity e, VirtualScreen scr)
+        {
+            scr.Write(e.Position.X, e.Position.Y, e.UnderChar);
+        }
+        
         public static void Add<T>(this LinkedList<T> list, T value)
         {
             list.AddLast(new LinkedListNode<T>(value));

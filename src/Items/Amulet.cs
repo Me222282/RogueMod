@@ -21,7 +21,7 @@ namespace RogueMod
         public override bool Equals(object obj) => obj is Amulet a;
         public override int GetHashCode() => HashCode.Combine(Type);
         
-        public void Effect(Character character, Stats tStats, Rogue game)
+        public void Effect(ICharacter character, Stats tStats, Rogue game)
         {
             throw new System.NotImplementedException();
         }

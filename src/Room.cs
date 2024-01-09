@@ -15,8 +15,6 @@ namespace RogueMod
         public bool Dark { get; set; }
         public RectangleI Bounds { get; }
         
-        public bool PlayerInRoom { get; private set; }
-        
         public LinkedList<IEntity> Entities { get; } = new LinkedList<IEntity>();
         public Door[] Doors { get; }
         
@@ -94,7 +92,19 @@ namespace RogueMod
                 e.Seen = true;
                 return true;
             }
+            
             return false;
+        }
+        public ItemEntity GetItemEntity(int x, int y)
+        {
+            foreach (IEntity e in Entities)
+            {
+                if (e is not ItemEntity ie ||
+                    e.Position.X != x || e.Position.Y != y) { continue; }
+                return ie;
+            }
+            
+            return null;
         }
         
         public Vector2I GetNextPosition()

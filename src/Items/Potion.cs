@@ -85,7 +85,7 @@ namespace RogueMod
             game.Discoveries.Potions[(int)PotionType] = true;
         }
 
-        public void Effect(Character character, Stats tStats, Rogue game)
+        public void Effect(ICharacter character, Stats tStats, Rogue game)
         {
             throw new NotImplementedException();
         }

@@ -57,11 +57,27 @@ namespace RogueMod
                 r.Render(Out, r == CurrentRoom);
             }
         }
-        public bool TryMoveEntity(int x, int y, IEntity entity)
+        public bool TryMoveEntity(int x, int y, IEntity entity, out Room room)
         {
             Vector2I oldPos = entity.Position;
-            bool success = RoomManager.TryMoveEntity(x, y, entity, out _);
+            bool success = RoomManager.TryMoveEntity(x, y, entity, out room);
             if (!success) { return false; }
+            
+            if (entity is ICharacter c && c.PickupItems && !c.Backpack.IsFull)
+            {
+                ItemEntity item = room.GetItemEntity(x, y);
+                if (item != null)
+                {
+                    if (c is Player)
+                    {
+                        Program.Message.Push("you gained an item");
+                    }
+                    
+                    c.Backpack.Add(item.Item);
+                    room.Leave(item);
+                    entity.UnDraw(Out);
+                }
+            }
             
             Out.Write(oldPos.X, oldPos.Y, entity.UnderChar);
             entity.UnderChar = Out.Read(x, y);
@@ -88,13 +104,8 @@ namespace RogueMod
             int x = oldPos.X + offset.X;
             int y = oldPos.Y + offset.Y;
             
-            bool success = RoomManager.TryMoveEntity(x, y, Player, out Room newRoom);
+            bool success = TryMoveEntity(x, y, Player, out Room newRoom);
             if (!success) { return false; }
-            
-            // Move player glyph
-            Out.Write(oldPos.X, oldPos.Y, Player.UnderChar);
-            Player.UnderChar = Out.Read(x, y);
-            Out.Write(x, y, Player.Graphic);
             
             if (CurrentRoom != null && CurrentRoom.Dark)
             {

@@ -78,6 +78,12 @@ namespace RogueMod
             
             Node last = null;
             Node n = _first;
+            if (n is null)
+            {
+                _first = new Node(item, null);
+                _last = _first;
+                return true;
+            }
             if (item.Stackable && n.Item.Equals(item))
             {
                 n.Item.Quantity += item.Quantity;
@@ -112,6 +118,7 @@ namespace RogueMod
         {
             Node pre = null;
             Node n = _first;
+            if (n is null) { return false; }
             for (int i = 0; i < Length; i++)
             {
                 if (n.Item != item)

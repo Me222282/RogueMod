@@ -80,7 +80,7 @@ namespace RogueMod
             return HashCode.Combine(WeaponType, Attack, Cursed, Quantity, Discovered, Stackable);
         }
         
-        public void Effect(Character character, Stats tStats, Rogue game)
+        public void Effect(ICharacter character, Stats tStats, Rogue game)
         {
             throw new NotImplementedException();
         }

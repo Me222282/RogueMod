@@ -1,4 +1,5 @@
 using System;
+using CursesSharp;
 
 namespace RogueMod
 {
@@ -21,6 +22,13 @@ namespace RogueMod
         public IItem Wearing { get; private set; }
         public IItem LeftRing { get; private set; }
         public IItem RightRing { get; private set; }
+        
+        public bool IsWeilding => Weilding is not null;
+        public bool IsWearing => Wearing is not null;
+        public bool IsLeftRing => LeftRing is not null;
+        public bool IsRightRing => RightRing is not null;
+        
+        public bool IsFull => _holding.Length == _holding.Capacity;
         
         public IItem this[char select] => _holding[select];
         public bool this[IItem item] => _holding[item];
@@ -91,6 +99,7 @@ namespace RogueMod
             char a = 'a';
             foreach (IItem item in _holding)
             {
+                Stdscr.Move(a - 'a', 0);
                 PrintItem(item, game, a);
                 a++;
             }
@@ -100,14 +109,13 @@ namespace RogueMod
             bool pl = item.Quantity > 1;
             string value = item.ToString(game, pl);
             
-            Console.Write(a);
-            Console.Write(" ) ");
+            Stdscr.Add(a);
+            Stdscr.Add(" ) ");
             if (item.Type != ItemType.Amulet)
             {
-                Console.Write(pl ? $"{item.Quantity} " : Vowels(value));
+                Stdscr.Add(pl ? $"{item.Quantity} " : Vowels(value));
             }
-            Console.Write(value);
-            Console.WriteLine();
+            Stdscr.Add(value);
         }
         public void PrintFilteredItemList(Rogue game, ItemType type)
         {

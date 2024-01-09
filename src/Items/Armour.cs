@@ -59,7 +59,7 @@ namespace RogueMod
         public bool IsKnown(Rogue game) => Discovered;
         public void MakeKnown(Rogue game) => Discovered = true;
 
-        public void Effect(Character character, Stats tStats, Rogue game)
+        public void Effect(ICharacter character, Stats tStats, Rogue game)
         {
             tStats.ArmourClass = ArmourClass + Modifier;
         }
