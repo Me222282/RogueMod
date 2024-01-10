@@ -13,7 +13,9 @@ namespace RogueMod
         Weapon,
         Key,
         Amulet,
-        MaxValue
+        Gold,
+        MaxValue,
+        Any
     }
     
     public interface IItem

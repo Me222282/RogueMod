@@ -57,31 +57,31 @@ namespace RogueMod
                 r.Render(Out, r == CurrentRoom);
             }
         }
-        public bool TryMoveEntity(int x, int y, IEntity entity, out Room room)
+        public bool TryMoveCharacter(int x, int y, ICharacter character, out Room room)
         {
-            Vector2I oldPos = entity.Position;
-            bool success = RoomManager.TryMoveEntity(x, y, entity, out room);
+            Vector2I oldPos = character.Position;
+            bool success = RoomManager.TryMoveEntity(x, y, character, out room);
             if (!success) { return false; }
             
-            if (entity is ICharacter c && c.PickupItems && !c.Backpack.IsFull)
+            if (character.PickupItems && !character.Backpack.IsFull)
             {
                 ItemEntity item = room.GetItemEntity(x, y);
                 if (item != null)
                 {
-                    if (c is Player)
+                    if (character is Player)
                     {
                         Program.Message.Push("you gained an item");
                     }
                     
-                    c.Backpack.Add(item.Item);
+                    character.Backpack.Add(item.Item);
                     room.Leave(item);
-                    entity.UnDraw(Out);
+                    item.UnDraw(Out);
                 }
             }
             
-            Out.Write(oldPos.X, oldPos.Y, entity.UnderChar);
-            entity.UnderChar = Out.Read(x, y);
-            Out.Write(x, y, entity.Graphic);
+            Out.Write(oldPos.X, oldPos.Y, character.UnderChar);
+            character.UnderChar = Out.Read(x, y);
+            Out.Write(x, y, character.Graphic);
             
             return true;
         }
@@ -104,7 +104,7 @@ namespace RogueMod
             int x = oldPos.X + offset.X;
             int y = oldPos.Y + offset.Y;
             
-            bool success = TryMoveEntity(x, y, Player, out Room newRoom);
+            bool success = TryMoveCharacter(x, y, Player, out Room newRoom);
             if (!success) { return false; }
             
             if (CurrentRoom != null && CurrentRoom.Dark)

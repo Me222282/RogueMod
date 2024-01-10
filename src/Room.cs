@@ -52,13 +52,20 @@ namespace RogueMod
                 scr.Write(e.Position.X, e.Position.Y, Draw.Floor);
             }
         }
-        public void Enter(IEntity entity)
+        public bool Enter(IEntity entity)
         {
-            if (entity is ItemEntity || entity is Gold)
+            if (entity is ItemEntity)
             {
-                entity.Position = GetNextPosition();
+                ItemEntity ie = GetItemEntity(entity.Position.X, entity.Position.Y);
+                if (ie is not null) { return false; }
             }
             Entities.Add(entity);
+            return true;
+        }
+        public void PlaceItem(ItemEntity item)
+        {
+            item.Position = GetNextPosition();
+            Entities.Add(item);
         }
         public void Leave(IEntity entity) => Entities.Remove(entity);
         

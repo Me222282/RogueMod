@@ -105,11 +105,6 @@ namespace RogueMod
             if (Length >= Capacity) { return false; }
             Length++;
             Node w = new Node(item, n);
-            if (last == null)
-            {
-                _first = w;
-                return true;
-            }
             
             last.Next = w;
             if (n == null) { _last = w; }
@@ -122,11 +117,16 @@ namespace RogueMod
             if (n is null) { return false; }
             for (int i = 0; i < Length; i++)
             {
-                if (n.Item != item)
+                if (!n.Item.Equals(item))
                 {
                     pre = n;
                     n = n.Next;
                     continue;
+                }
+                if (n.Item.Stackable && n.Item.Quantity > 1)
+                {
+                    n.Item.Quantity -= item.Quantity;
+                    return true;
                 }
                 
                 Length--;
@@ -143,7 +143,40 @@ namespace RogueMod
             
             return false;
         }
-
+        public bool Remove(IItem item, int qauntity)
+        {
+            Node pre = null;
+            Node n = _first;
+            if (n is null) { return false; }
+            for (int i = 0; i < Length; i++)
+            {
+                if (!n.Item.Equals(item))
+                {
+                    pre = n;
+                    n = n.Next;
+                    continue;
+                }
+                if (n.Item.Stackable && n.Item.Quantity > 1)
+                {
+                    n.Item.Quantity -= qauntity;
+                    return true;
+                }
+                
+                Length--;
+                
+                if (pre == null)
+                {
+                    _first = n;
+                    return true;
+                }
+                pre.Next = n.Next;
+                if (n.Next == null) { _last = pre; }
+                return true;
+            }
+            
+            return false;
+        }
+        
         public IEnumerator<IItem> GetEnumerator() => new Enumerator(_first);
         IEnumerator IEnumerable.GetEnumerator() => new Enumerator(_first);
 

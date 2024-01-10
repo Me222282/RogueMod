@@ -28,7 +28,7 @@ namespace RogueMod
             Splash();
             
             Rogue game = new Rogue(Properties.Size);
-            game.RoomManager.Rooms[0].Enter(new ItemEntity(Ring.Create()));
+            game.RoomManager.Rooms[0].PlaceItem(new ItemEntity(Ring.Create()));
             
             game.Render();
             
@@ -110,14 +110,14 @@ namespace RogueMod
                     game.Out.Print();
                     return;
                 case 'i':
-                    if (game.Player.Backpack.IsEmpty)
-                    {
-                        Message.Push("You are empty handed");
-                        return;
-                    }
-                    Stdscr.Clear();
-                    Out.PrintList(game.Player.Backpack.GetItemList(game), true, Out.DefaultOnChar);
-                    game.Out.Print();
+                    SelectItem(game, ItemType.Any);
+                    return;
+                case 'd':
+                    IItem item = SelectItem(game, ItemType.Any);
+                    game.Player.Backpack.DropOne(item);
+                    ItemEntity ie = new ItemEntity(item, game.Player.Position);
+                    game.CurrentRoom.Enter(ie);
+                    game.Player.UnderChar = ie.Graphic;
                     return;
                 case (Keys.F0 + 3):
                 case 'a':
@@ -138,6 +138,39 @@ namespace RogueMod
                     game.Eluminate(game.CurrentRoom);
                     return;
             }
+        }
+        private static IItem SelectItem(Rogue game, ItemType type)
+        {   
+            if (game.Player.Backpack.IsEmpty)
+            {
+                Message.Push("You are empty handed");
+                return null;
+            }
+            
+            IItem select = null;
+            
+            Stdscr.Clear();
+            Out.PrintList(game.Player.Backpack.GetItemList(game), true, ch =>
+            {
+                if (ch == Keys.ESC) { return Out.Return.Return; }
+                if (ch == ' ') { return Out.Return.Break; }
+                if (char.IsLetter((char)ch))
+                {
+                    char c = char.ToLower((char)ch);
+                    try
+                    {
+                        select = game.Player.Backpack[c];
+                    }
+                    catch (Exception) { }
+                    
+                    return Out.Return.Break;
+                }
+                
+                return Out.Return.Continue;
+            });
+            game.Out.Print();
+            
+            return select;
         }
         
         private static readonly string[] _controlVisual = new string[]

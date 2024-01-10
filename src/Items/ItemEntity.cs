@@ -63,6 +63,10 @@ namespace RogueMod
                 case ItemType.Weapon:
                     Graphic = (char)Draw.Weapon;
                     return;
+                    
+                case ItemType.Gold:
+                    Graphic = (char)Draw.Gold;
+                    return;
             }
         }
     }

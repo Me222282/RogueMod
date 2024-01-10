@@ -77,8 +77,18 @@ namespace RogueMod
             return true;
         }
         
-        public bool Add(IItem item) => _holding.Add(item);
+        public bool Add(IItem item)
+        {
+            if (item.Type == ItemType.Gold)
+            {
+                Gold += item.Quantity;
+                return true;
+            }
+            
+            return _holding.Add(item);
+        }
         public bool Remove(IItem item) => _holding.Remove(item);
+        public bool DropOne(IItem item) => _holding.Remove(item, 1);
         
         private static string Vowels(string next)
         {
@@ -126,7 +136,7 @@ namespace RogueMod
             char a = 'a';
             foreach (IItem item in _holding)
             {
-                if (item.Type != type)
+                if (type != ItemType.Any && item.Type != type)
                 {
                     a++;
                     continue;
