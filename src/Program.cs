@@ -110,8 +110,10 @@ namespace RogueMod
                     return;
                 case Controls.Drop:
                     IItem item = SelectItem(game, ItemType.Any);
+                    if (item is null) { return; }
                     game.Player.Backpack.DropOne(item);
                     ItemEntity ie = new ItemEntity(item, game.Player.Position);
+                    ie.UnderChar = game.Player.UnderChar;
                     game.CurrentRoom.Enter(ie);
                     game.Player.UnderChar = ie.Graphic;
                     return;

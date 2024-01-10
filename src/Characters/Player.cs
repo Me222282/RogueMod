@@ -48,7 +48,7 @@ namespace RogueMod
                 return a.ArmourClass + a.Modifier;
             }
         }
-        public EntityFlags Flags { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
+        public EntityFlags Flags { get; set; }
         public bool PickupItems => true;
 
         public Backpack Backpack { get; }

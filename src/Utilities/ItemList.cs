@@ -33,18 +33,9 @@ namespace RogueMod
             get
             {
                 Node item = _first;
-                int end = select - 'a';
-                int leng = Length / 2;
-                if (end < leng)
-                {
-                    for (int i = 0; i < leng; i++)
-                    {
-                        item = item.Next;
-                    }
-                    return item.Item;
-                }
+                int end = char.ToLower(select) - 'a';
                 
-                for (int i = Length - 1; i >= leng; i--)
+                for (int i = 0; i < end; i++)
                 {
                     item = item.Next;
                 }
@@ -110,39 +101,7 @@ namespace RogueMod
             if (n == null) { _last = w; }
             return true;
         }
-        public bool Remove(IItem item)
-        {
-            Node pre = null;
-            Node n = _first;
-            if (n is null) { return false; }
-            for (int i = 0; i < Length; i++)
-            {
-                if (!n.Item.Equals(item))
-                {
-                    pre = n;
-                    n = n.Next;
-                    continue;
-                }
-                if (n.Item.Stackable && n.Item.Quantity > 1)
-                {
-                    n.Item.Quantity -= item.Quantity;
-                    return true;
-                }
-                
-                Length--;
-                
-                if (pre == null)
-                {
-                    _first = n;
-                    return true;
-                }
-                pre.Next = n.Next;
-                if (n.Next == null) { _last = pre; }
-                return true;
-            }
-            
-            return false;
-        }
+        public bool Remove(IItem item) => Remove(item, item?.Quantity ?? 0);
         public bool Remove(IItem item, int qauntity)
         {
             Node pre = null;
@@ -159,14 +118,21 @@ namespace RogueMod
                 if (n.Item.Stackable && n.Item.Quantity > 1)
                 {
                     n.Item.Quantity -= qauntity;
-                    return true;
+                    if (n.Item.Quantity > 0)
+                    {
+                        return true;
+                    }
                 }
                 
                 Length--;
                 
                 if (pre == null)
                 {
-                    _first = n;
+                    _first = n.Next;
+                    if (_first == null)
+                    {
+                        _last = null;
+                    }
                     return true;
                 }
                 pre.Next = n.Next;
