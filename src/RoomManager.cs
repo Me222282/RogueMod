@@ -22,7 +22,7 @@ namespace RogueMod
         {
             Rooms = new Room[]
             {
-                new Room(new RectangleI(2, 2, 10, 10), true,
+                new Room(new RectangleI(2, 2, 60, 20), true,
                     new Door[] { new Door(4, false), new Door(3, true) })
             };
             FillMap(0);

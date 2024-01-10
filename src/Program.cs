@@ -38,6 +38,8 @@ namespace RogueMod
             game.RoomManager.Rooms[0].PlaceItem(new ItemEntity(Potion.Create()));
             game.RoomManager.Rooms[0].PlaceItem(new ItemEntity(new Gold(100)));
             game.RoomManager.Rooms[0].PlaceItem(new ItemEntity(new Gold(30)));
+            game.RoomManager.Rooms[0].PlaceItem(new ItemEntity(Food.Create()));
+            game.RoomManager.Rooms[0].PlaceItem(new ItemEntity(Food.Create()));
             
             game.Render();
             
@@ -177,6 +179,11 @@ namespace RogueMod
                 return Out.Return.Continue;
             });
             game.Out.Print();
+            
+            if (select != null && select.Type != type)
+            {
+                return null;
+            }
             
             return select;
         }

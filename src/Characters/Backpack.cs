@@ -79,6 +79,11 @@ namespace RogueMod
         
         public bool Add(IItem item)
         {
+            if (item.Quantity < 1)
+            {
+                item.Quantity = 1;
+            }
+            
             if (item.Type == ItemType.Gold)
             {
                 Gold += item.Quantity;
@@ -90,7 +95,7 @@ namespace RogueMod
         public bool Remove(IItem item) => _holding.Remove(item);
         public bool DropOne(IItem item) => _holding.Remove(item, 1);
         
-        private static string Vowels(string next)
+        internal static string Vowels(string next)
         {
             switch (next[0])
             {
@@ -123,11 +128,31 @@ namespace RogueMod
             bool pl = item.Quantity > 1;
             string value = item.ToString(game, pl);
             
-            if (item.Type != ItemType.Amulet)
+            string mod = "";
+            if (item.Equals(Weilding))
             {
-                return pl ? $"{item.Quantity} {value}" : $"{Vowels(value)} {value}";
+                mod = " (weapon in hand)";
             }
-            return value;
+            else if (item.Equals(Wearing))
+            {
+                mod = " (being worn)";
+            }
+            else if (item.Equals(LeftRing))
+            {
+                mod = " (on left hand)";
+            }
+            else if (item.Equals(RightRing))
+            {
+                mod = " (on right hand)";
+            }
+            
+            if (item.Type != ItemType.Amulet &&
+                item.Type != ItemType.Armour &&
+                item.Type != ItemType.Food)
+            {
+                return pl ? $"{item.Quantity} {value}{mod}" : $"{Vowels(value)} {value}{mod}";
+            }
+            return value + mod;
         }
         public string[] GetFilteredItemList(Rogue game, ItemType type)
         {

@@ -12,6 +12,7 @@ namespace RogueMod
         public int StartingStrength { get; } = 16;
         public int BackpackSize { get; } = 23;
         public int StomachSize { get; } = 100;
+        public string Fruit { get; } = "slime mold";
     }
     
     public class Controls
