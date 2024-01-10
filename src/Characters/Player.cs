@@ -50,7 +50,9 @@ namespace RogueMod
         }
         public EntityFlags Flags { get; set; }
         public bool PickupItems => true;
-
+        
+        public int Food { get; set; } = Program.Properties.StomachSize;
+        
         public Backpack Backpack { get; }
 
         public Vector2I Position { get; set; }

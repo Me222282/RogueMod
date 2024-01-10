@@ -29,6 +29,15 @@ namespace RogueMod
             
             Rogue game = new Rogue(Properties.Size);
             game.RoomManager.Rooms[0].PlaceItem(new ItemEntity(Ring.Create()));
+            game.RoomManager.Rooms[0].PlaceItem(new ItemEntity(Ring.Create()));
+            game.RoomManager.Rooms[0].PlaceItem(new ItemEntity(Scroll.Create()));
+            game.RoomManager.Rooms[0].PlaceItem(new ItemEntity(Scroll.Create()));
+            game.RoomManager.Rooms[0].PlaceItem(new ItemEntity(Staff.Create(game)));
+            game.RoomManager.Rooms[0].PlaceItem(new ItemEntity(Staff.Create(game)));
+            game.RoomManager.Rooms[0].PlaceItem(new ItemEntity(Potion.Create()));
+            game.RoomManager.Rooms[0].PlaceItem(new ItemEntity(Potion.Create()));
+            game.RoomManager.Rooms[0].PlaceItem(new ItemEntity(new Gold(100)));
+            game.RoomManager.Rooms[0].PlaceItem(new ItemEntity(new Gold(30)));
             
             game.Render();
             
@@ -93,6 +102,7 @@ namespace RogueMod
             switch (ch)
             {
                 case Controls.LastMessage:
+                case Controls.LastMessageB:
                     Message.PushLastMessage();
                     return;
                 case Controls.ControlVis:

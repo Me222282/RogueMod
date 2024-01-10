@@ -16,6 +16,7 @@ namespace RogueMod
             InitPotions();
             InitRings();
             InitScrolls();
+            InitStaffs();
         }
         private void InitPotions()
         {

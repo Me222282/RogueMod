@@ -81,23 +81,30 @@ namespace RogueMod
                 n.Item.Quantity += item.Quantity;
                 return true;
             }
-            while (n.Item.Type < item.Type)
-            {   
-                last = n;
-                n = n.Next;
-                
+            while (n != null && n.Item.Type < item.Type)
+            {
                 if (item.Stackable && n.Item.Equals(item))
                 {
                     n.Item.Quantity += item.Quantity;
                     return true;
                 }
+                
+                last = n;
+                n = n.Next;
             }
             
             if (Length >= Capacity) { return false; }
             Length++;
             Node w = new Node(item, n);
             
-            last.Next = w;
+            if (last == null)
+            {
+                _first = w;
+            }
+            else
+            {
+                last.Next = w;
+            }
             if (n == null) { _last = w; }
             return true;
         }
