@@ -31,13 +31,13 @@ namespace RogueMod
         
         public Player()
         {
-            Backpack = new Backpack(23);
+            Backpack = new Backpack(Program.Properties.BackpackSize);
         }
         
         public double HP { get; set; }
-        public double MaxHP { get; private set; }
+        public double MaxHP { get; private set; } = Program.Properties.StartingHP;
         public int Level { get; private set; }
-        public double Strength { get; set; } = 16;
+        public double Strength { get; set; } = Program.Properties.StartingStrength;
         public int ArmourClass
         {
             get
@@ -78,7 +78,7 @@ namespace RogueMod
             HP += 8;
         }
 
-        public void Interact(Rogue game)
+        public void Action(Rogue game)
         {
             
         }

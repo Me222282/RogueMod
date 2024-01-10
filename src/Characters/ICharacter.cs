@@ -32,6 +32,6 @@ namespace RogueMod
         
         public Backpack Backpack { get; }
         
-        public void Interact(Rogue game);
+        public void Action(Rogue game);
     }
 }

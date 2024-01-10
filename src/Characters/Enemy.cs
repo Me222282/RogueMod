@@ -46,6 +46,6 @@ namespace RogueMod
         public char Graphic { get; }
         public char UnderChar { get; set; }
 
-        public abstract void Interact(Rogue game);
+        public abstract void Action(Rogue game);
     }
 }

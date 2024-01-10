@@ -84,53 +84,49 @@ namespace RogueMod
         private static int _lastAction;
         private static void ManageKeyInput(int ch, Rogue game)
         {
-            if (ch != 'a')
+            if (ch != Controls.Repeat &&
+                ch != Controls.RepeatB)
             {
                 _lastAction = ch;
             }
             
             switch (ch)
             {
-                case 'm':
-                    Message.Push("This is the first message");
-                    Message.Push("The next message");
-                    Message.Push("Last but not least!");
-                    return;
-                case (Keys.F0 + 4):
+                case Controls.LastMessage:
                     Message.PushLastMessage();
                     return;
-                case (Keys.F0 + 1):
+                case Controls.ControlVis:
                     Stdscr.Clear();
                     Out.PrintList(_controlVisual, (Out.Width / 2) < 37, Out.DefaultOnChar);
                     game.Out.Print();
                     return;
-                case (Keys.F0 + 2):
+                case Controls.SymbolVis:
                     Stdscr.Clear();
                     Out.PrintList(_symbolVisual, (Out.Width / 2) < 37, Out.DefaultOnChar);
                     game.Out.Print();
                     return;
-                case 'i':
+                case Controls.Inventory:
                     SelectItem(game, ItemType.Any);
                     return;
-                case 'd':
+                case Controls.Drop:
                     IItem item = SelectItem(game, ItemType.Any);
                     game.Player.Backpack.DropOne(item);
                     ItemEntity ie = new ItemEntity(item, game.Player.Position);
                     game.CurrentRoom.Enter(ie);
                     game.Player.UnderChar = ie.Graphic;
                     return;
-                case (Keys.F0 + 3):
-                case 'a':
+                case Controls.RepeatB:
+                case Controls.Repeat:
                     ManageKeyInput(_lastAction, game);
                     return;
-                case Keys.UP:
-                case Keys.DOWN:
-                case Keys.LEFT:
-                case Keys.RIGHT:
-                case Keys.PPAGE:
-                case Keys.NPAGE:
-                case Keys.END:
-                case Keys.HOME:
+                case (int)Direction.Up:
+                case (int)Direction.Down:
+                case (int)Direction.Left:
+                case (int)Direction.Right:
+                case (int)Direction.UpLeft:
+                case (int)Direction.UpRight:
+                case (int)Direction.DownLeft:
+                case (int)Direction.DownRight:
                     game.TryMovePlayer((Direction)ch);
                     return;
                 case 'l':
