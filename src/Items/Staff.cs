@@ -88,9 +88,9 @@ namespace RogueMod
             game.Discoveries.Sticks[(int)StaffType] = true;
         }
         
-        public void Effect(ICharacter character, Stats tStats, Rogue game)
+        public void Effect(ICharacter character, Rogue game)
         {
-            throw new System.NotImplementedException();
+            Uses--;
         }
         
         public static Staff Create(Rogue game)

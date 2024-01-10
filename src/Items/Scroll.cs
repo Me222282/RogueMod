@@ -87,7 +87,7 @@ namespace RogueMod
             game.Discoveries.Scrolls[(int)ScrollType] = true;
         }
         
-        public void Effect(ICharacter character, Stats tStats, Rogue game)
+        public void Effect(ICharacter character, Rogue game)
         {
             throw new NotImplementedException();
         }

@@ -20,9 +20,12 @@ namespace RogueMod
         
         public bool FoodType { get; }
         
-        public void Effect(ICharacter character, Stats tStats, Rogue game)
+        public void Effect(ICharacter character, Rogue game)
         {
-            
+            if (character is Player p)
+            {
+                p.Food = Program.Properties.StomachSize;
+            }
         }
 
         public bool IsKnown(Rogue game) => true;

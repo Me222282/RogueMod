@@ -21,7 +21,7 @@ namespace RogueMod
         public bool Stackable => true;
         public int Value => 10;
 
-        public void Effect(ICharacter character, Stats tStats, Rogue game)
+        public void Effect(ICharacter character, Rogue game)
              => throw new NotSupportedException();
         public bool IsKnown(Rogue game) => true;
         public void MakeKnown(Rogue game) => throw new NotSupportedException();

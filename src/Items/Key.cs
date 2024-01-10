@@ -32,9 +32,9 @@ namespace RogueMod
             return HashCode.Combine(Cursed, Quantity);
         }
         
-        public void Effect(ICharacter character, Stats tStats, Rogue game)
+        public void Effect(ICharacter character, Rogue game)
         {
-            throw new System.NotImplementedException();
+            throw new System.NotSupportedException();
         }
     }
 }
