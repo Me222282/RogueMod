@@ -80,6 +80,16 @@ namespace RogueMod
             return HashCode.Combine(WeaponType, Attack, Cursed, Quantity, Discovered, Stackable);
         }
         
+        public IItem Copy()
+        {
+            Weapon w = new Weapon(WeaponType, Attack.Melee, Attack.Range);
+            if (Stackable)
+            {
+                w.Quantity = Quantity;
+            }
+            return w;
+        }
+        
         public void Effect(ICharacter character, Rogue game)
         {
             throw new NotImplementedException();
@@ -101,6 +111,16 @@ namespace RogueMod
                 WeaponType.Bolt => new Weapon(weapon, "1d2", "2d5"),
                 _ => throw new Exception()
             };
+        }
+        public static Weapon Create()
+        {
+            Weapon w = Create((WeaponType)Program.RNG.Next((int)WeaponType.MaxValue));
+            if (w.Stackable)
+            {
+                w.Quantity = Program.RNG.Next(1, 30);
+            }
+            
+            return w;
         }
     }
 }

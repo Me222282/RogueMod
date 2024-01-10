@@ -94,7 +94,9 @@ namespace RogueMod
         {
             game.Discoveries.Rings[(int)RingType] = true;
         }
-
+        
+        public IItem Copy() => new Ring(RingType);
+        
         public void Effect(ICharacter character, Rogue game)
         {
             throw new NotImplementedException();

@@ -43,7 +43,7 @@ namespace RogueMod
             
             if (Discovered)
             {
-                m = Program.GetMod(Modifier);
+                m = $"{Program.GetMod(Modifier)} ";
                 discover = $"[armour class {ArmourClass + Modifier}]";
             }
             
@@ -53,13 +53,15 @@ namespace RogueMod
                 arm = "armour";
             }
             
-            return $"{m} {Name} {arm}{discover}";
+            return $"{m}{Name} {arm}{discover}";
         }
         
         public bool IsKnown(Rogue game) => Discovered;
         public void MakeKnown(Rogue game) => Discovered = true;
 
         public void Effect(ICharacter character, Rogue game) { }
+        
+        public IItem Copy() => new Armour(Name, ArmourClass) { Modifier = Modifier };
         
         public static Armour Create(ArmourType armour)
         {
@@ -76,5 +78,7 @@ namespace RogueMod
                 _ => throw new Exception()
             };
         }
+        public static Armour Create()
+            => Create((ArmourType)Program.RNG.Next((int)ArmourType.MaxValue));
     }
 }

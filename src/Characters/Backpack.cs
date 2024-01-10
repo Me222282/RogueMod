@@ -94,6 +94,7 @@ namespace RogueMod
         }
         public bool Remove(IItem item) => _holding.Remove(item);
         public bool DropOne(IItem item) => _holding.Remove(item, 1);
+        public bool DropAll(IItem item) => _holding.Remove(item);
         
         internal static string Vowels(string next)
         {

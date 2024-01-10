@@ -99,7 +99,9 @@ namespace RogueMod
         {
             return HashCode.Combine(PotionType, Value, Cursed, Quantity);
         }
-    
+        
+        public IItem Copy() => new Potion(PotionType);
+        
         public static Potion Create()
             => new Potion((PotionType)Program.RNG.Next((int)PotionType.MaxValue));
     }

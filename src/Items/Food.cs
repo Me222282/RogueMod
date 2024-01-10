@@ -47,6 +47,8 @@ namespace RogueMod
             return "some food";
         }
         
+        public IItem Copy() => new Food(FoodType);
+                
         public override bool Equals(object obj)
         {
             return obj is Food s && s.FoodType == FoodType;
@@ -56,6 +58,6 @@ namespace RogueMod
             return HashCode.Combine(FoodType, Value, Cursed, Quantity);
         }
         
-        public static Food Create() => new Food(false);
+        public static Food Create() => new Food(Program.RNG.Next(2) == 1);
     }
 }

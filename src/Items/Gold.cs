@@ -20,11 +20,12 @@ namespace RogueMod
         public int Quantity { get; set; }
         public bool Stackable => true;
         public int Value => 10;
-
+        
         public void Effect(ICharacter character, Rogue game)
              => throw new NotSupportedException();
         public bool IsKnown(Rogue game) => true;
         public void MakeKnown(Rogue game) => throw new NotSupportedException();
         public string ToString(Rogue game, bool plural) => throw new NotSupportedException();
+        public IItem Copy() => throw new NotSupportedException();
     }
 }

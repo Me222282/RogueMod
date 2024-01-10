@@ -34,6 +34,8 @@ namespace RogueMod
         public void Effect(ICharacter character, Rogue game);
         public string ToString(Rogue game, bool plural);
         
+        public IItem Copy();
+        
         public class Comparer : IComparer<IItem>
         {
             public int Compare(IItem x, IItem y)

@@ -103,6 +103,8 @@ namespace RogueMod
             return HashCode.Combine(ScrollType, Value, Cursed, Quantity);
         }
         
+        public IItem Copy() => new Scroll(ScrollType);
+        
         public static Scroll Create()
             => new Scroll((ScrollType)Program.RNG.Next((int)ScrollType.MaxValue));
     }

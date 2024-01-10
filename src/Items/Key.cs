@@ -36,5 +36,7 @@ namespace RogueMod
         {
             throw new System.NotSupportedException();
         }
+        
+        public IItem Copy() => new Key();
     }
 }

@@ -40,6 +40,14 @@ namespace RogueMod
             game.RoomManager.Rooms[0].PlaceItem(new ItemEntity(new Gold(30)));
             game.RoomManager.Rooms[0].PlaceItem(new ItemEntity(Food.Create()));
             game.RoomManager.Rooms[0].PlaceItem(new ItemEntity(Food.Create()));
+            game.RoomManager.Rooms[0].PlaceItem(new ItemEntity(Weapon.Create()));
+            game.RoomManager.Rooms[0].PlaceItem(new ItemEntity(Weapon.Create()));
+            game.RoomManager.Rooms[0].PlaceItem(new ItemEntity(Armour.Create()));
+            game.RoomManager.Rooms[0].PlaceItem(new ItemEntity(Armour.Create()));
+            game.RoomManager.Rooms[0].PlaceItem(new ItemEntity(new Key()));
+            game.RoomManager.Rooms[0].PlaceItem(new ItemEntity(new Key()));
+            game.RoomManager.Rooms[0].PlaceItem(new ItemEntity(new Amulet()));
+            game.RoomManager.Rooms[0].PlaceItem(new ItemEntity(new Amulet()));
             
             game.Render();
             
@@ -122,9 +130,17 @@ namespace RogueMod
                     return;
                 case Controls.Drop:
                     IItem item = SelectItem(game, ItemType.Any);
+                    IItem drop = item.Copy();
                     if (item is null) { return; }
-                    game.Player.Backpack.DropOne(item);
-                    ItemEntity ie = new ItemEntity(item, game.Player.Position);
+                    if (item is Weapon && item.Stackable)
+                    {
+                        game.Player.Backpack.DropAll(item);
+                    }
+                    else
+                    {
+                        game.Player.Backpack.DropOne(item);
+                    }
+                    ItemEntity ie = new ItemEntity(drop, game.Player.Position);
                     ie.UnderChar = game.Player.UnderChar;
                     game.CurrentRoom.Enter(ie);
                     game.Player.UnderChar = ie.Graphic;
@@ -180,7 +196,7 @@ namespace RogueMod
             });
             game.Out.Print();
             
-            if (select != null && select.Type != type)
+            if (type != ItemType.Any && select != null && select.Type != type)
             {
                 return null;
             }

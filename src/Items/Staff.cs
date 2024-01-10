@@ -93,6 +93,8 @@ namespace RogueMod
             Uses--;
         }
         
+        public IItem Copy() => new Staff(StaffType, Attack, Uses);
+        
         public static Staff Create(Rogue game)
         {
             StaffType type = (StaffType)Program.RNG.Next((int)StaffType.MaxValue);
