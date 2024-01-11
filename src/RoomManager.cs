@@ -1,3 +1,4 @@
+using System;
 using Zene.Structs;
 
 namespace RogueMod
@@ -5,6 +6,7 @@ namespace RogueMod
     public sealed class RoomManager
     {
         public const int Corridor = -1;
+        public const int LockedDoor = -2;
         public const int NoEntry = 0;
         
         public RoomManager(Vector2I playingSize)
@@ -23,7 +25,7 @@ namespace RogueMod
             Rooms = new Room[]
             {
                 new Room(new RectangleI(2, 2, 60, 20), true,
-                    new Door[] { new Door(4, false), new Door(3, true) })
+                    new Door[] { new Door(4, false, false, true), new Door(3, true) })
             };
             FillMap(0);
         }
@@ -37,6 +39,7 @@ namespace RogueMod
                 r.Bounds.Height - 2);
             
             roomIndex++;
+            // Fill room
             for (int y = innerBounds.Y; y < (innerBounds.Y + innerBounds.Height); y++)
             {
                 for (int x = innerBounds.X; x < innerBounds.Right; x++)
@@ -44,10 +47,13 @@ namespace RogueMod
                     _roomMap[y, x] = roomIndex;
                 }
             }
+            // Doors
             for (int i = 0; i < r.Doors.Length; i++)
             {
+                if (r.Doors[i].Hidden) { continue; }
+                int num = r.Doors[i].Locked ? LockedDoor : roomIndex;
                 Vector2I pos = r.GetDoor(i);
-                _roomMap[pos.Y, pos.X] = roomIndex;
+                _roomMap[pos.Y, pos.X] = num;
             }
         }
         public Room GetRoom(int x, int y)
@@ -57,7 +63,7 @@ namespace RogueMod
         }
         public bool TryMoveEntity(int x, int y, IEntity entity, out Room room)
         {
-            if (_roomMap[y, x] == NoEntry)
+            if (_roomMap[y, x] == NoEntry || _roomMap[y, x] == LockedDoor)
             {
                 room = GetRoom(entity.Position.X, entity.Position.Y);
                 return false;
@@ -86,6 +92,30 @@ namespace RogueMod
                 return r.Dark && !r.OnBoundary(x, y) && !r.SeeEntity(x, y);
             }
             return false;
+        }
+        
+        public void UnlockDoor(Room r, int dr)
+        {
+            Door d = r.Doors[dr];
+            
+            d.Locked = false;
+            if (d.Hidden) { return; }
+            
+            int i = Array.IndexOf(Rooms, r);
+            Vector2I pos = r.GetDoor(dr);
+            _roomMap[pos.Y, pos.X] = i;
+        }
+        public void ShowDoor(Room r, int dr, VirtualScreen scr)
+        {
+            Door d = r.Doors[dr];
+            
+            d.Hidden = false;
+            
+            int i = d.Locked ? LockedDoor : Array.IndexOf(Rooms, r);
+            Vector2I pos = r.GetDoor(dr);
+            _roomMap[pos.Y, pos.X] = i;
+            
+            d.Draw(r, scr);
         }
         
         public Room GetRandomRoom() => Rooms[Program.RNG.Next(Rooms.Length)];

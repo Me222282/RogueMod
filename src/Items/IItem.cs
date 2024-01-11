@@ -6,12 +6,12 @@ namespace RogueMod
     {
         Food,
         Scroll,
+        Key,
         Ring,
         Staff,
         Potion,
         Armour,
         Weapon,
-        Key,
         Amulet,
         Gold,
         MaxValue,

@@ -24,7 +24,9 @@ namespace RogueMod
             
             for (int i = 0; i < Doors.Length; i++)
             {
-                Doors[i].Draw(this, scr);
+                Door r = Doors[i];
+                if (r.Hidden) { continue; }
+                r.Draw(this, scr);
             }
             
             scr.Fill(Bounds.X + 1, Bounds.Y + 1,
