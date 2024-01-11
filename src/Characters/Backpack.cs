@@ -36,7 +36,13 @@ namespace RogueMod
         
         public bool Weild(char select)
         {
-            if (Weilding.Cursed) { return false; }
+            if (IsWeilding && Weilding.Cursed) { return false; }
+            
+            if (select == '\0')
+            {
+                Weilding = null;
+                return true;
+            }
             
             Weilding = _holding[select];
             
@@ -44,7 +50,13 @@ namespace RogueMod
         }
         public bool Wear(char select)
         {
-            if (Wearing.Cursed) { return false; }
+            if (IsWearing && Wearing.Cursed) { return false; }
+            
+            if (select == '\0')
+            {
+                Wearing = null;
+                return true;
+            }
             
             IItem item = _holding[select];
             if (item.Type != ItemType.Armour)
@@ -59,13 +71,10 @@ namespace RogueMod
         public bool WearRing(char select, bool left)
         {
             IItem r = left ? LeftRing : RightRing;
-            if (r.Cursed) { return false; }
+            if (r is not null && r.Cursed) { return false; }
             
-            IItem item = _holding[select];
-            if (item.Type != ItemType.Ring)
-            {
-                return false;
-            }
+            IItem item = select =='\0' ? null : _holding[select];
+            if (select !='\0' && item.Type != ItemType.Ring) { return false; }
             
             if (left)
             {
@@ -95,6 +104,8 @@ namespace RogueMod
         public bool Remove(IItem item) => _holding.Remove(item);
         public bool DropOne(IItem item) => _holding.Remove(item, 1);
         public bool DropAll(IItem item) => _holding.Remove(item);
+        
+        public char GetChar(IItem item) => _holding.IndexOf(item);
         
         internal static string Vowels(string next)
         {

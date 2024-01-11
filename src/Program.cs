@@ -128,6 +128,37 @@ namespace RogueMod
                 case Controls.Inventory:
                     SelectItem(game, ItemType.Any);
                     return;
+                case Controls.Wear:
+                    if (game.Player.Backpack.IsWearing)
+                    {
+                        Message.Push("You are already wearing some. You'll have to take it off first.");
+                        return;
+                    }
+                    char wear = SelectItemChar(game, ItemType.Armour);
+                    try
+                    {
+                        game.Player.Backpack.Wear(wear);
+                        IItem w = game.Player.Backpack.Wearing;
+                        w.MakeKnown(game);
+                        Message.Push($"You are now wearing {w.ToString(game, false)}");
+                    }
+                    catch (Exception) { }
+                    return;
+                case Controls.TakeOff:
+                    if (!game.Player.Backpack.IsWearing)
+                    {
+                        Message.Push("You aren't wearing any amour");
+                        return;
+                    }
+                    IItem oldWear = game.Player.Backpack.Wearing;
+                    if (!game.Player.Backpack.Wear('\0'))
+                    {
+                        Message.Push("Your amour is cursed!");
+                        return;
+                    }
+                    char c = game.Player.Backpack.GetChar(oldWear);
+                    Message.Push($"You used to be wearing {c}) {oldWear.ToString(game, false)}");
+                    return;
                 case Controls.Drop:
                     IItem item = SelectItem(game, ItemType.Any);
                     IItem drop = item.Copy();
@@ -166,14 +197,33 @@ namespace RogueMod
             }
         }
         private static IItem SelectItem(Rogue game, ItemType type)
+        {
+            char c = SelectItemChar(game, type);
+            if (c == '\0') { return null; }
+            
+            IItem item = null;
+            try
+            {
+                item = game.Player.Backpack[c];
+            }
+            catch (Exception) { }
+            
+            if (item is null || (type != ItemType.Any && item.Type != type))
+            {
+                return null;
+            }
+            
+            return item;
+        }
+        private static char SelectItemChar(Rogue game, ItemType type)
         {   
             if (game.Player.Backpack.IsEmpty)
             {
                 Message.Push("You are empty handed");
-                return null;
+                return '\0';
             }
             
-            IItem select = null;
+            char c = '\0';
             
             Stdscr.Clear();
             Out.PrintList(game.Player.Backpack.GetItemList(game), true, ch =>
@@ -182,13 +232,7 @@ namespace RogueMod
                 if (ch == ' ') { return Out.Return.Break; }
                 if (char.IsLetter((char)ch))
                 {
-                    char c = char.ToLower((char)ch);
-                    try
-                    {
-                        select = game.Player.Backpack[c];
-                    }
-                    catch (Exception) { }
-                    
+                    c = char.ToLower((char)ch);
                     return Out.Return.Break;
                 }
                 
@@ -196,12 +240,7 @@ namespace RogueMod
             });
             game.Out.Print();
             
-            if (type != ItemType.Any && select != null && select.Type != type)
-            {
-                return null;
-            }
-            
-            return select;
+            return c;
         }
         
         private static readonly string[] _controlVisual = new string[]

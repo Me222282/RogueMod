@@ -44,7 +44,7 @@ namespace RogueMod
             if (Discovered)
             {
                 m = $"{Program.GetMod(Modifier)} ";
-                discover = $"[armour class {ArmourClass + Modifier}]";
+                discover = $" [armour class {ArmourClass + Modifier}]";
             }
             
             string arm = "mail";

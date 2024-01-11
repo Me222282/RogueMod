@@ -150,6 +150,18 @@ namespace RogueMod
             return false;
         }
         
+        public char IndexOf(IItem item)
+        {
+            Node n = _first;
+            for (int i = 0; i < Length; i++, n = n.Next)
+            {
+                if (!n.Item.Equals(item)) { continue; }
+                return (char)(i + 'a');
+            }
+            
+            return '\0';
+        }
+        
         public IEnumerator<IItem> GetEnumerator() => new Enumerator(_first);
         IEnumerator IEnumerable.GetEnumerator() => new Enumerator(_first);
 
