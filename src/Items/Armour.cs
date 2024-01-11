@@ -35,7 +35,7 @@ namespace RogueMod
         public bool Discovered { get; set; }
         public bool Stackable => false;
 
-        public int Value => 0;
+        public int Value => 30 * (ArmourClass + Modifier);
 
         public string ToString(Rogue game, bool plural)
         {

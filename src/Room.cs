@@ -86,6 +86,17 @@ namespace RogueMod
             }
             return Bounds.Location + (x, y);
         }
+        public int GetDoor(int x, int y)
+        {
+            Vector2I v = (x, y);
+            for (int i = 0; i < Doors.Length; i++)
+            {
+                if (GetDoor(i) != v) { continue; }
+                return i;
+            }
+            
+            return -1;
+        }
         public bool OnBoundary(int x, int y)
         {
             return x == Bounds.X || x == Bounds.Right ||

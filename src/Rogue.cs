@@ -105,7 +105,23 @@ namespace RogueMod
             int y = oldPos.Y + offset.Y;
             
             bool success = TryMoveCharacter(x, y, Player, out Room newRoom);
-            if (!success) { return false; }
+            if (!success)
+            {
+                if (!RoomManager.IsLocked(x, y))
+                {
+                    return false;                    
+                }
+                if (!Player.Backpack.DropOne(new Key()))
+                {
+                    Program.Message.Push("The door is locked!");
+                    return false;
+                }
+                
+                RoomManager.UnlockDoor(newRoom, newRoom.GetDoor(x, y));
+                
+                Program.Message.Push("You unlocked the door");
+                return false;
+            }
             
             if (CurrentRoom != null && CurrentRoom.Dark)
             {

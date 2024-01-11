@@ -101,7 +101,7 @@ namespace RogueMod
             d.Locked = false;
             if (d.Hidden) { return; }
             
-            int i = Array.IndexOf(Rooms, r);
+            int i = Array.IndexOf(Rooms, r) + 1;
             Vector2I pos = r.GetDoor(dr);
             _roomMap[pos.Y, pos.X] = i;
         }
@@ -111,12 +111,14 @@ namespace RogueMod
             
             d.Hidden = false;
             
-            int i = d.Locked ? LockedDoor : Array.IndexOf(Rooms, r);
+            int i = d.Locked ? LockedDoor : Array.IndexOf(Rooms, r) + 1;
             Vector2I pos = r.GetDoor(dr);
             _roomMap[pos.Y, pos.X] = i;
             
             d.Draw(r, scr);
         }
+        
+        public bool IsLocked(int x, int y) => _roomMap[y, x] == LockedDoor;
         
         public Room GetRandomRoom() => Rooms[Program.RNG.Next(Rooms.Length)];
     }
