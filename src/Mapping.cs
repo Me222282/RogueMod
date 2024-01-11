@@ -145,7 +145,7 @@ namespace RogueMod
                     }
                     cp.Append(' ');
                 }
-                cp.Remove(cp.Length - 1, 1);
+                cp = cp.Remove(cp.Length - 1, 1);
                 
                 Scrolls[i] = cp.ToString();
             }
