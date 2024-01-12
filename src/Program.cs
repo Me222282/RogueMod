@@ -47,7 +47,6 @@ namespace RogueMod
             game.RoomManager.Rooms[0].PlaceItem(new ItemEntity(new Key()));
             game.RoomManager.Rooms[0].PlaceItem(new ItemEntity(new Key()));
             game.RoomManager.Rooms[0].PlaceItem(new ItemEntity(new Amulet()));
-            game.RoomManager.Rooms[0].PlaceItem(new ItemEntity(new Amulet()));
             
             game.Render();
             
@@ -144,6 +143,16 @@ namespace RogueMod
                     }
                     catch (Exception) { }
                     return;
+                case Controls.Wield:
+                    char wield = SelectItemChar(game, ItemType.Any);
+                    try
+                    {
+                        game.Player.Backpack.Wield(wield);
+                        IItem w = game.Player.Backpack.Wielding;
+                        Message.Push($"You are now wielding {w.ToString(game, false)} ({wield})");
+                    }
+                    catch (Exception) { }
+                    return;
                 case Controls.TakeOff:
                     if (!game.Player.Backpack.IsWearing)
                     {
@@ -227,8 +236,51 @@ namespace RogueMod
             
             char c = '\0';
             
+            string[] list = game.Player.Backpack.GetFilteredItemList(game, type);
+            
+            if (list.IsNullFull())
+            {
+                Message.Push("You have nothing appropriate");
+                return '\0';
+            }
+            
             Stdscr.Clear();
-            Out.PrintList(game.Player.Backpack.GetItemList(game), true, ch =>
+            Out.PrintList(list, true, ch =>
+            {
+                if (ch == Keys.ESC) { return Out.Return.Return; }
+                if (ch == ' ') { return Out.Return.Break; }
+                if (char.IsLetter((char)ch))
+                {
+                    c = char.ToLower((char)ch);
+                    return Out.Return.Break;
+                }
+                
+                return Out.Return.Continue;
+            });
+            game.Out.Print();
+            
+            return c;
+        }
+        private static char SelectWeaponChar(Rogue game)
+        {   
+            if (game.Player.Backpack.IsEmpty)
+            {
+                Message.Push("You are empty handed");
+                return '\0';
+            }
+            
+            char c = '\0';
+            
+            string[] list = game.Player.Backpack.GetFilteredItemList(game, i => i.Attack != Damage.Zero);
+            
+            if (list.IsNullFull())
+            {
+                Message.Push("You have nothing appropriate");
+                return '\0';
+            }
+            
+            Stdscr.Clear();
+            Out.PrintList(list, true, ch =>
             {
                 if (ch == Keys.ESC) { return Out.Return.Return; }
                 if (ch == ' ') { return Out.Return.Break; }

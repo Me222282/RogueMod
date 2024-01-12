@@ -62,5 +62,16 @@ namespace RogueMod
                 }
             }
         }
+        
+        public static bool IsNullFull<T>(this T[] array)
+        {
+            for (int i = 0; i < array.Length; i++)
+            {
+                if (array[i] == null) { continue; }
+                return false;
+            }
+            
+            return true;
+        }
     }
 }

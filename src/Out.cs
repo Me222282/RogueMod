@@ -288,6 +288,7 @@ namespace RogueMod
                 
                 if (y >= (Height - 2))
                 {
+                    Out.ColourNormal();
                     Stdscr.Add(Height - 1, 0, "--Press space for more, Esc to continue--");
                     while (true)
                     {
@@ -302,9 +303,12 @@ namespace RogueMod
                     continue;
                 }
                 
+                if (list[j] == null) { i--; continue; }
+                
                 Write(x, y, list[j], true);
             }
             
+            Out.ColourNormal();
             Stdscr.Add(Height - 1, 0, "--Press space to continue--");
             Return sp;
             do

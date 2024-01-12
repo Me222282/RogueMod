@@ -18,12 +18,12 @@ namespace RogueMod
         
         private ItemList _holding;
         
-        public IItem Weilding { get; private set; }
+        public IItem Wielding { get; private set; }
         public IItem Wearing { get; private set; }
         public IItem LeftRing { get; private set; }
         public IItem RightRing { get; private set; }
         
-        public bool IsWeilding => Weilding is not null;
+        public bool IsWielding => Wielding is not null;
         public bool IsWearing => Wearing is not null;
         public bool IsLeftRing => LeftRing is not null;
         public bool IsRightRing => RightRing is not null;
@@ -34,17 +34,17 @@ namespace RogueMod
         public IItem this[char select] => _holding[select];
         public bool this[IItem item] => _holding[item];
         
-        public bool Weild(char select)
+        public bool Wield(char select)
         {
-            if (IsWeilding && Weilding.Cursed) { return false; }
+            if (IsWielding && Wielding.Cursed) { return false; }
             
             if (select == '\0')
             {
-                Weilding = null;
+                Wielding = null;
                 return true;
             }
             
-            Weilding = _holding[select];
+            Wielding = _holding[select];
             
             return true;
         }
@@ -141,7 +141,7 @@ namespace RogueMod
             string value = item.ToString(game, pl);
             
             string mod = "";
-            if (item.Equals(Weilding))
+            if (item.Equals(Wielding))
             {
                 mod = " (weapon in hand)";
             }
@@ -179,7 +179,7 @@ namespace RogueMod
                     continue;
                 }
                 
-                l[a - 'a'] = $"{a} ) {GetItemString(item, game)}";
+                l[a - 'a'] = $"{a}) {GetItemString(item, game)}";
                 a++;
             }
             
@@ -198,7 +198,7 @@ namespace RogueMod
                     continue;
                 }
                 
-                l[a - 'a'] = $"{a} ) {GetItemString(item, game)}";
+                l[a - 'a'] = $"{a}) {GetItemString(item, game)}";
                 a++;
             }
             
