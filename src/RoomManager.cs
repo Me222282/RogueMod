@@ -19,6 +19,7 @@ namespace RogueMod
         private int[,] _roomMap;
         
         public Room[] Rooms { get; private set; }
+        public CorridorManager CorridorManager { get; private set; }
         
         public void GenRooms(int level)
         {
@@ -27,7 +28,20 @@ namespace RogueMod
                 new Room(new RectangleI(2, 2, 60, 20), true,
                     new Door[] { new Door(4, false, false, true), new Door(3, true) })
             };
-            FillMap(0);
+            CorridorManager = new CorridorManager(new Corridor[]
+            {
+                new Corridor((6, 0), (6, 1)),
+                new Corridor((6, 0), (0, 0)),
+                new Corridor((0, 0), (0, 5)),
+                new Corridor((0, 5), (1, 5))
+            });
+            
+            FillMapC();
+            
+            for (int i = 0; i < Rooms.Length; i++)
+            {
+                FillMap(i);
+            }
         }
         private void FillMap(int roomIndex)
         {
@@ -56,28 +70,60 @@ namespace RogueMod
                 _roomMap[pos.Y, pos.X] = num;
             }
         }
-        public Room GetRoom(int x, int y)
+        private void FillMapC()
+        {
+            for (int i = 0; i < CorridorManager.Corridors.Length; i++)
+            {
+                Corridor c = CorridorManager.Corridors[i];
+                Vector2I pos = c.Position;
+                
+                for (int j = 0; j < c.Length; j++)
+                {
+                    _roomMap[pos.Y, pos.X] = Corridor;
+                    if (c.Vertical)
+                    {
+                        pos.Y++;
+                    }
+                    else
+                    {
+                        pos.X++;
+                    }
+                }
+            }
+        }
+        public IEntityContainer GetEntityContainer(int x, int y)
         {
             int m = _roomMap[y, x];
+            if (m == Corridor)
+            {
+                return CorridorManager;
+            }
             return m < 1 ? null : Rooms[m - 1];
         }
-        public bool TryMoveEntity(int x, int y, IEntity entity, out Room room)
+        public bool TryMoveEntity(int x, int y, IEntity entity, out IEntityContainer room)
         {
-            if (_roomMap[y, x] == NoEntry || _roomMap[y, x] == LockedDoor)
+            if (x < 0 || x >= _size.X ||
+                y < 0 || y >= _size.Y)
             {
-                room = GetRoom(entity.Position.X, entity.Position.Y);
+                room = null;
                 return false;
             }
             
-            Room oldRoom = GetRoom(entity.Position.X, entity.Position.Y);
+            if (_roomMap[y, x] == NoEntry || _roomMap[y, x] == LockedDoor)
+            {
+                room = GetEntityContainer(entity.Position.X, entity.Position.Y);
+                return false;
+            }
+            
+            IEntityContainer oldRoom = GetEntityContainer(entity.Position.X, entity.Position.Y);
             
             entity.Position = (x, y);
-            room = GetRoom(x, y);
+            room = GetEntityContainer(x, y);
             
             if (oldRoom != room)
             {
-                oldRoom?.Leave(entity);
-                room?.Enter(entity);
+                oldRoom.Leave(entity);
+                room.Enter(entity);
             }
             
             return true;
@@ -94,26 +140,46 @@ namespace RogueMod
             return false;
         }
         
-        public void UnlockDoor(Room r, int dr)
+        private int MapIfCan(int x, int y)
         {
-            Door d = r.Doors[dr];
+            if (x < 0 || x >= _size.X ||
+                y < 0 || y >= _size.Y)
+            {
+                return 0;
+            }
+            
+            return _roomMap[y, x];
+        }
+        public int GetRoom(int x, int y)
+        {
+            int a = MapIfCan(x + 1, y);
+            int b = MapIfCan(x, y + 1);
+            int c = MapIfCan(x - 1, y);
+            int d = MapIfCan(x, y - 1);
+            
+            return Math.Max(Math.Max(a, b), Math.Max(c, d)) - 1;
+        }
+        public void UnlockDoor(int x, int y)
+        {
+            int i = GetRoom(x, y);
+            Room r = Rooms[i];
+            Door d = r.Doors[r.GetDoor(x, y)];
             
             d.Locked = false;
             if (d.Hidden) { return; }
             
-            int i = Array.IndexOf(Rooms, r) + 1;
-            Vector2I pos = r.GetDoor(dr);
-            _roomMap[pos.Y, pos.X] = i;
+            _roomMap[y, x] = i + 1;
         }
-        public void ShowDoor(Room r, int dr, VirtualScreen scr)
+        public void ShowDoor(int x, int y, VirtualScreen scr)
         {
-            Door d = r.Doors[dr];
+            int i = GetRoom(x, y);
+            Room r = Rooms[i];
+            Door d = r.Doors[r.GetDoor(x, y)];
             
             d.Hidden = false;
             
-            int i = d.Locked ? LockedDoor : Array.IndexOf(Rooms, r) + 1;
-            Vector2I pos = r.GetDoor(dr);
-            _roomMap[pos.Y, pos.X] = i;
+            i = d.Locked ? LockedDoor : i + 1;
+            _roomMap[y, x] = i;
             
             d.Draw(r, scr);
         }

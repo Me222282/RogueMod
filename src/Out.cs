@@ -103,7 +103,7 @@ namespace RogueMod
                 Curses.InitPair((short)(i + 8), i, 7);
             }
         }
-        private static bool _onGrey = false;
+        
         public static void SetColour(Colours colour, bool reverse = false)
         {
             Stdscr.Attr = GetAttribute(colour, reverse);
@@ -118,14 +118,14 @@ namespace RogueMod
             Stdscr.Attr |= Attrs.REVERSE;
         }
         public static void ColourNormal() => Stdscr.Attr = Attrs.NORMAL;
-        public static uint GetAttribute(Colours colour, bool reverse = false)
+        public static uint GetAttribute(Colours colour, bool reverse = false, bool onGrey = false)
         {
             uint s = reverse ? Attrs.REVERSE : Attrs.NORMAL;
             uint b = colour > Colours.LightGrey ? Attrs.BOLD : Attrs.NORMAL;
-            int a = _onGrey ? 8 : 0;
+            int a = onGrey ? 8 : 0;
             return Curses.COLOR_PAIR((int)colour & 0x7 + a) | b | s;
         }
-        public static uint GetAttribute(Draw c)
+        public static uint GetAttribute(Draw c, bool onGrey = false)
         {
             switch (c)
             {
@@ -136,15 +136,15 @@ namespace RogueMod
                 case Draw.WallBL:
                 case Draw.WallV:
                 case Draw.WallTR:
-                    return GetAttribute(Colours.Brown);
+                    return GetAttribute(Colours.Brown, false, onGrey);
                 
                 case Draw.Floor:
-                    return GetAttribute(Colours.Green);
+                    return GetAttribute(Colours.Green, false, onGrey);
                     
                 case Draw.Player:
                 case Draw.Gold:
                 case Draw.Key:
-                    return GetAttribute(Colours.Yellow);
+                    return GetAttribute(Colours.Yellow, false, onGrey);
                 
                 case Draw.Staff:
                 case Draw.Weapon:
@@ -153,22 +153,22 @@ namespace RogueMod
                 case Draw.Ring:
                 case Draw.Scroll:
                 case Draw.Potion:
-                    return GetAttribute(Colours.Blue);
+                    return GetAttribute(Colours.Blue, false, onGrey);
                     
                 case Draw.Food:
-                    return GetAttribute(Colours.Red);
+                    return GetAttribute(Colours.Red, false, onGrey);
                     
                 case Draw.Trap:
-                    return GetAttribute(Colours.Magenta);
+                    return GetAttribute(Colours.Magenta, false, onGrey);
                     
                 case Draw.Stairs:
-                    return GetAttribute(Colours.Green, true);
+                    return GetAttribute(Colours.Green, true, onGrey);
                     
                 case Draw.Passage:
                 case Draw.PassageB:
                 case Draw.Magic:
                 case Draw.MagicB:
-                    return GetAttribute(Colours.LightGrey);
+                    return GetAttribute(Colours.Grey);
             }
             
             return Attrs.NORMAL;
@@ -186,9 +186,8 @@ namespace RogueMod
         }
         public static void WriteB(int x, int y, char c)
         {
-            _onGrey = true;
-            Write(x, y, c, true);
-            _onGrey = false;
+            Stdscr.Attr = GetAttribute((Draw)c, true);
+            Stdscr.AddW(y, x, c);
         }
         public static void Write(int x, int y, string str, bool colour = false, uint attr = Attrs.NORMAL)
         {

@@ -9,7 +9,7 @@ namespace RogueMod
         public VirtualScreen(Vector2I size)
         {
             _map = new Unit[size.Y, size.X];
-            _map.Fill(new Unit(' '));
+            _map.Fill(new Unit(' ', false));
             _vis = new bool[size.Y - 3, size.X];
             Size = size;
         }
@@ -28,7 +28,7 @@ namespace RogueMod
                 _vis[y, x] = value;
                 if (!PrintDirect) { return; }
                 
-                Unit u = value ? _map[y + 1, x] : new Unit(' ');
+                Unit u = value ? _map[y + 1, x] : new Unit(' ', false);
                 Stdscr.Attr = u.Attribute;
                 Stdscr.AddW(y + 1, x, u.Character);
             }
@@ -38,7 +38,7 @@ namespace RogueMod
         // Add 1 to y to leave space for Messages
         public void Write(int x, int y, char ch)
         {
-            Unit u = new Unit(ch);
+            Unit u = new Unit(ch, _map[y + 1, x].Grey);
             _map[y + 1, x] = u;
             
             if (!PrintDirect || !Visable(x, y)) { return; }
@@ -48,7 +48,7 @@ namespace RogueMod
         }
         public void Write(int x, int y, Draw ch)
         {
-            Unit u = new Unit(ch);
+            Unit u = new Unit(ch, _map[y + 1, x].Grey);
             _map[y + 1, x] = u;
             
             if (!PrintDirect || !Visable(x, y)) { return; }
@@ -121,7 +121,7 @@ namespace RogueMod
             Stdscr.Move(line, 0);
             for (int i = 0; i < Size.X; i++)
             {
-                Unit u = Visable(i, line - 1) ? _map[line, i] : new Unit(' ');
+                Unit u = Visable(i, line - 1) ? _map[line, i] : new Unit(' ', false);
                 Stdscr.Attr = u.Attribute;
                 Stdscr.AddW(u.Character);
             }
@@ -134,28 +134,60 @@ namespace RogueMod
                 
                 for (int x = 0; x < Size.X; x++)
                 {
-                    Unit u = Visable(x, y - 1) ? _map[y, x] : new Unit(' ');
+                    Unit u = Visable(x, y - 1) ? _map[y, x] : new Unit(' ', false);
                     Stdscr.Attr = u.Attribute;
                     Stdscr.AddW(u.Character);
                 }
             }
         }
         
+        public void Clear()
+        {
+            _map.Fill(new Unit(' ', false));
+            if (PrintDirect) { Print(); }
+        }
+        
+        public void FillCorridors(CorridorManager cm)
+        {
+            for (int i = 0; i < cm.Corridors.Length; i++)
+            {
+                Corridor c = cm.Corridors[i];
+                Vector2I pos = c.Position;
+                pos.Y++;
+                
+                for (int j = 0; j < c.Length; j++)
+                {
+                    _map[pos.Y, pos.X].Grey = true;
+                    if (c.Vertical)
+                    {
+                        pos.Y++;
+                    }
+                    else
+                    {
+                        pos.X++;
+                    }
+                }
+            }
+        }
+        
         private struct Unit
         {
-            public Unit(char c)
+            public Unit(char c, bool grey)
             {
                 Character = c;
-                Attribute = Out.GetAttribute((Draw)c);
+                Attribute = Out.GetAttribute((Draw)c, grey);
+                Grey = grey;
             }
-            public Unit(Draw d)
+            public Unit(Draw d, bool grey)
             {
                 Character = (char)d;
-                Attribute = Out.GetAttribute(d);
+                Attribute = Out.GetAttribute(d, grey);
+                Grey = grey;
             }
             
             public char Character;
             public uint Attribute;
+            public bool Grey;
         }
     }
 }

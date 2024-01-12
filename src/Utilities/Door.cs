@@ -2,18 +2,18 @@ namespace RogueMod
 {
     public struct Door
     {
-        public Door(int l, bool b)
+        public Door(int l, bool v)
         {
             Location = l;
-            Vertical = b;
+            Vertical = v;
             
             Hidden = false;
             Locked = false;
         }
-        public Door(int l, bool b, bool h, bool lk)
+        public Door(int l, bool v, bool h, bool lk)
         {
             Location = l;
-            Vertical = b;
+            Vertical = v;
             
             Hidden = h;
             Locked = lk;

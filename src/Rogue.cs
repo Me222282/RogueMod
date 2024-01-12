@@ -27,6 +27,7 @@ namespace RogueMod
             
             Player = new Player();
             RoomManager.GenRooms(1);
+            Out.FillCorridors(RoomManager.CorridorManager);
             
             Room playerRoom = RoomManager.GetRandomRoom();
             Player.Position = playerRoom.GetNextPosition();
@@ -46,7 +47,7 @@ namespace RogueMod
         
         public RoomManager RoomManager { get; }
         public Player Player { get; }
-        public Room CurrentRoom { get; private set; }
+        public IEntityContainer CurrentRoom { get; private set; }
         
         public void Render()
         {
@@ -56,8 +57,9 @@ namespace RogueMod
                 Room r = RoomManager.Rooms[i];
                 r.Render(Out, r == CurrentRoom);
             }
+            RoomManager.CorridorManager.Render(Out, false);
         }
-        public bool TryMoveCharacter(int x, int y, ICharacter character, out Room room)
+        public bool TryMoveCharacter(int x, int y, ICharacter character, out IEntityContainer room)
         {
             Vector2I oldPos = character.Position;
             bool success = RoomManager.TryMoveEntity(x, y, character, out room);
@@ -104,7 +106,13 @@ namespace RogueMod
             int x = oldPos.X + offset.X;
             int y = oldPos.Y + offset.Y;
             
-            bool success = TryMoveCharacter(x, y, Player, out Room newRoom);
+            if (x < 0 || x >= PlayingSize.X ||
+                y < 0 || y >= PlayingSize.Y)
+            {
+                return false;
+            }
+            
+            bool success = TryMoveCharacter(x, y, Player, out IEntityContainer newRoom);
             if (!success)
             {
                 if (!RoomManager.IsLocked(x, y))
@@ -117,7 +125,7 @@ namespace RogueMod
                     return false;
                 }
                 
-                RoomManager.UnlockDoor(newRoom, newRoom.GetDoor(x, y));
+                RoomManager.UnlockDoor(x, y);
                 
                 Program.Message.Push("You unlocked the door");
                 return false;
@@ -136,7 +144,7 @@ namespace RogueMod
                 CurrentRoom.RenderEntites(Out, false);
                 
                 CurrentRoom = newRoom;
-                Eluminate(newRoom);
+                Eluminate(newRoom as Room);
                 
                 // Render new room with entites
                 newRoom.RenderEntites(Out, true);
@@ -159,6 +167,8 @@ namespace RogueMod
         }
         public void Eluminate(Room room)
         {
+            if (room is null) { return; }
+            
             if (room.Dark)
             {
                 // Show previously seen entities

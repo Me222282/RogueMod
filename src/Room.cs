@@ -3,7 +3,7 @@ using Zene.Structs;
 
 namespace RogueMod
 {
-    public class Room
+    public class Room : IEntityContainer
     {
         public Room(RectangleI bounds, bool dark, Door[] doors)
         {
@@ -49,9 +49,11 @@ namespace RogueMod
                 return;
             }
             
+            Draw replace = Dark ? (Draw)' ' : Draw.Floor;
+            
             foreach (IEntity e in Entities)
             {
-                scr.Write(e.Position.X, e.Position.Y, Draw.Floor);
+                scr.Write(e.Position.X, e.Position.Y, replace);
             }
         }
         public bool Enter(IEntity entity)

@@ -25,7 +25,10 @@ namespace RogueMod
         
         public static void Draw(this IEntity e, VirtualScreen scr)
         {
-            e.UnderChar = scr.Read(e.Position.X, e.Position.Y);
+            char c = scr.Read(e.Position.X, e.Position.Y);
+            // Already drawn
+            if (c == e.Graphic) { return; }
+            e.UnderChar = c;
             
             scr.Write(e.Position.X, e.Position.Y, e.Graphic);
         }

@@ -16,15 +16,15 @@ namespace RogueMod
             if (a.X == b.X)
             {
                 Position = Math.Min(a.Y, b.Y) == a.Y ? a : b;
-                Vertical = false;
+                Vertical = true;
             }
             else
             {
                 Position = Math.Min(a.X, b.X) == a.X ? a : b;
-                Vertical = true;
+                Vertical = false;
             }
             
-            Length = Math.Abs((a.X - b.X) + (a.Y - b.Y));
+            Length = Math.Abs((a.X - b.X) + (a.Y - b.Y)) + 1;
         }
         
         public Vector2I Position { get; }

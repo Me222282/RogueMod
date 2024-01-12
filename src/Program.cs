@@ -191,8 +191,10 @@ namespace RogueMod
                     game.TryMovePlayer((Direction)ch);
                     return;
                 case 'l':
-                    game.CurrentRoom.Dark = false;
-                    game.Eluminate(game.CurrentRoom);
+                    Room room = game.CurrentRoom as Room;
+                    if (room is null) { return; }
+                    room.Dark = false;
+                    game.Eluminate(room);
                     return;
             }
         }
