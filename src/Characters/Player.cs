@@ -80,9 +80,6 @@ namespace RogueMod
             HP += 8;
         }
 
-        public void Action(Rogue game)
-        {
-            
-        }
+        public void Action(Rogue game) { }
     }
 }
