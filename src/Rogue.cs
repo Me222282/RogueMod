@@ -121,13 +121,13 @@ namespace RogueMod
                 }
                 if (!Player.Backpack.DropOne(new Key()))
                 {
-                    Program.Message.Push("The door is locked!");
+                    Program.Message.Push(Messages.DoorLocked);
                     return false;
                 }
                 
                 RoomManager.UnlockDoor(x, y);
                 
-                Program.Message.Push("You unlocked the door");
+                Program.Message.Push(Messages.UnlockedDoor);
                 return false;
             }
             

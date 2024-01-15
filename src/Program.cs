@@ -125,65 +125,25 @@ namespace RogueMod
                     game.Out.Print();
                     return;
                 case Controls.Inventory:
-                    SelectItem(game, ItemType.Any);
+                    Actions.SelectItemChar(game, ItemType.Any);
                     return;
                 case Controls.Wear:
-                    if (game.Player.Backpack.IsWearing)
-                    {
-                        Message.Push("You are already wearing some. You'll have to take it off first.");
-                        return;
-                    }
-                    char wear = SelectItemChar(game, ItemType.Armour);
-                    try
-                    {
-                        game.Player.Backpack.Wear(wear);
-                        IItem w = game.Player.Backpack.Wearing;
-                        w.MakeKnown(game);
-                        Message.Push($"You are now wearing {w.ToString(game, false)}");
-                    }
-                    catch (Exception) { }
+                    Actions.Wear(game);
                     return;
                 case Controls.Wield:
-                    char wield = SelectItemChar(game, ItemType.Any);
-                    try
-                    {
-                        game.Player.Backpack.Wield(wield);
-                        IItem w = game.Player.Backpack.Wielding;
-                        Message.Push($"You are now wielding {w.ToString(game, false)} ({wield})");
-                    }
-                    catch (Exception) { }
+                    Actions.Wield(game);
                     return;
                 case Controls.TakeOff:
-                    if (!game.Player.Backpack.IsWearing)
-                    {
-                        Message.Push("You aren't wearing any amour");
-                        return;
-                    }
-                    IItem oldWear = game.Player.Backpack.Wearing;
-                    if (!game.Player.Backpack.Wear('\0'))
-                    {
-                        Message.Push("Your amour is cursed!");
-                        return;
-                    }
-                    char c = game.Player.Backpack.GetChar(oldWear);
-                    Message.Push($"You used to be wearing {c}) {oldWear.ToString(game, false)}");
+                    Actions.TakeOff(game);
                     return;
                 case Controls.Drop:
-                    IItem item = SelectItem(game, ItemType.Any);
-                    IItem drop = item.Copy();
-                    if (item is null) { return; }
-                    if (item is Weapon && item.Stackable)
-                    {
-                        game.Player.Backpack.DropAll(item);
-                    }
-                    else
-                    {
-                        game.Player.Backpack.DropOne(item);
-                    }
-                    ItemEntity ie = new ItemEntity(drop, game.Player.Position);
-                    ie.UnderChar = game.Player.UnderChar;
-                    game.CurrentRoom.Enter(ie);
-                    game.Player.UnderChar = ie.Graphic;
+                    Actions.Drop(game);
+                    return;
+                case Controls.PutOnRing:
+                    Actions.PutOnRing(game);
+                    return;
+                case Controls.RemoveRing:
+                    Actions.TakeOffRing(game);
                     return;
                 case Controls.RepeatB:
                 case Controls.Repeat:
@@ -206,95 +166,6 @@ namespace RogueMod
                     game.Eluminate(room);
                     return;
             }
-        }
-        private static IItem SelectItem(Rogue game, ItemType type)
-        {
-            char c = SelectItemChar(game, type);
-            if (c == '\0') { return null; }
-            
-            IItem item = null;
-            try
-            {
-                item = game.Player.Backpack[c];
-            }
-            catch (Exception) { }
-            
-            if (item is null || (type != ItemType.Any && item.Type != type))
-            {
-                return null;
-            }
-            
-            return item;
-        }
-        private static char SelectItemChar(Rogue game, ItemType type)
-        {   
-            if (game.Player.Backpack.IsEmpty)
-            {
-                Message.Push("You are empty handed");
-                return '\0';
-            }
-            
-            char c = '\0';
-            
-            string[] list = game.Player.Backpack.GetFilteredItemList(game, type);
-            
-            if (list.IsNullFull())
-            {
-                Message.Push("You have nothing appropriate");
-                return '\0';
-            }
-            
-            Stdscr.Clear();
-            Out.PrintList(list, true, ch =>
-            {
-                if (ch == Keys.ESC) { return Out.Return.Return; }
-                if (ch == ' ') { return Out.Return.Break; }
-                if (char.IsLetter((char)ch))
-                {
-                    c = char.ToLower((char)ch);
-                    return Out.Return.Break;
-                }
-                
-                return Out.Return.Continue;
-            });
-            game.Out.Print();
-            
-            return c;
-        }
-        private static char SelectWeaponChar(Rogue game)
-        {   
-            if (game.Player.Backpack.IsEmpty)
-            {
-                Message.Push("You are empty handed");
-                return '\0';
-            }
-            
-            char c = '\0';
-            
-            string[] list = game.Player.Backpack.GetFilteredItemList(game, i => i.Attack != Damage.Zero);
-            
-            if (list.IsNullFull())
-            {
-                Message.Push("You have nothing appropriate");
-                return '\0';
-            }
-            
-            Stdscr.Clear();
-            Out.PrintList(list, true, ch =>
-            {
-                if (ch == Keys.ESC) { return Out.Return.Return; }
-                if (ch == ' ') { return Out.Return.Break; }
-                if (char.IsLetter((char)ch))
-                {
-                    c = char.ToLower((char)ch);
-                    return Out.Return.Break;
-                }
-                
-                return Out.Return.Continue;
-            });
-            game.Out.Print();
-            
-            return c;
         }
         
         private static readonly string[] _controlVisual = new string[]

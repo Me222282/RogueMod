@@ -26,6 +26,8 @@ namespace RogueMod
         public const int Repeat = 'a';
         public const int Wear = 'W';
         public const int TakeOff = 'T';
+        public const int PutOnRing = 'P';
+        public const int RemoveRing = 'R';
         public const int Wield = 'w';
         public const int RepeatB = Keys.F0 + 3;
     }
