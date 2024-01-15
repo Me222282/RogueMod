@@ -81,8 +81,8 @@ namespace RogueMod
                 n.Item.Quantity += item.Quantity;
                 return true;
             }
-            while (n != null && n.Item.Type < item.Type)
-            {
+            while (n != null && n.Item.Type <= item.Type)
+            {   
                 if (item.Stackable && n.Item.Equals(item))
                 {
                     n.Item.Quantity += item.Quantity;

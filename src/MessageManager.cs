@@ -32,6 +32,8 @@ namespace RogueMod
         {
             Clear();
             
+            if (message == null) { return; }
+            
             Out.ColourNormal();
             
             Stdscr.Add(0, 0, message);
