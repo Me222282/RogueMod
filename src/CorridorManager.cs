@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace RogueMod
@@ -82,5 +83,8 @@ namespace RogueMod
             
             return false;
         }
+
+        public IEnumerator<IEntity> GetEnumerator() => Entities.GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator() => Entities.GetEnumerator();
     }
 }

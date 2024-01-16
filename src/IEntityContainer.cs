@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace RogueMod
 {
-    public interface IEntityContainer
+    public interface IEntityContainer : IEnumerable<IEntity>
     {
         public bool Dark { get; }
         

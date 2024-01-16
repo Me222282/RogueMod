@@ -316,5 +316,10 @@ namespace RogueMod
                 sp = manager(Stdscr.GetChar());
             } while (sp == Return.Continue);
         }
+        
+        public static void Animate(Vector2I start, Vector2I end, char c)
+        {
+            
+        }
     }
 }

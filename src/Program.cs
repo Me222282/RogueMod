@@ -125,25 +125,25 @@ namespace RogueMod
                     game.Out.Print();
                     return;
                 case Controls.Inventory:
-                    Actions.SelectItemChar(game, ItemType.Any);
+                    PlayerActions.SelectItemChar(game, ItemType.Any);
                     return;
                 case Controls.Wear:
-                    Actions.Wear(game);
+                    PlayerActions.Wear(game);
                     return;
                 case Controls.Wield:
-                    Actions.Wield(game);
+                    PlayerActions.Wield(game);
                     return;
                 case Controls.TakeOff:
-                    Actions.TakeOff(game);
+                    PlayerActions.TakeOff(game);
                     return;
                 case Controls.Drop:
-                    Actions.Drop(game);
+                    PlayerActions.Drop(game);
                     return;
                 case Controls.PutOnRing:
-                    Actions.PutOnRing(game);
+                    PlayerActions.PutOnRing(game);
                     return;
                 case Controls.RemoveRing:
-                    Actions.TakeOffRing(game);
+                    PlayerActions.TakeOffRing(game);
                     return;
                 case Controls.RepeatB:
                 case Controls.Repeat:

@@ -1,9 +1,10 @@
 using System;
 using CursesSharp;
+using Zene.Structs;
 
 namespace RogueMod
 {
-    public static class Actions
+    public static class PlayerActions
     {
         public static void Drop(Rogue game)
         {
@@ -149,6 +150,48 @@ namespace RogueMod
             }
             char c = game.Player.Backpack.GetChar(oldWear);
             Program.Message.Push($"You used to be wearing {c}) {oldWear.ToString(game, false)}");
+        }
+        public static void Throw(Rogue game)
+        {
+            if (game.Player.Backpack.IsEmpty)
+            {
+                Program.Message.Push("You are empty handed");
+                return;
+            }
+            
+            Out.ColourNormal();
+            Stdscr.Add(0, 0, "Pick a direction");
+            int ch;
+            do
+            {
+                ch = Stdscr.GetChar();
+                if (ch == Keys.ESC) { return; }
+            } while (!ch.IsDirection());
+            
+            char th = SelectWeaponChar(game);
+            IItem item = null;
+            try
+            {
+                item = game.Player.Backpack[th];
+            }
+            catch (Exception) { }
+            if (item is null) { return; }
+            
+            ICharacter hit = game.GetCharacter(game.Player.Position, (Direction)ch);
+            Vector2I hitPos;
+            if (hit == null)
+            {
+                hitPos = game.RoomManager.GetHit(game.Player.Position, (Direction)ch);
+            }
+            else
+            {
+                hitPos = hit.Position;
+            }
+            hitPos -= ((Direction)ch).GetOffset();
+            
+            game.Player.Backpack.DropOne(item);
+            char graphic = new ItemEntity(item).Graphic;
+            
         }
         
         public static IItem SelectItem(Rogue game, ItemType type)

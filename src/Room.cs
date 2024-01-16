@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using Zene.Structs;
 
@@ -146,5 +147,8 @@ namespace RogueMod
             
             return (x, y);
         }
+        
+        public IEnumerator<IEntity> GetEnumerator() => Entities.GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator() => Entities.GetEnumerator();
     }
 }

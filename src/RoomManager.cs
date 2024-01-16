@@ -150,7 +150,7 @@ namespace RogueMod
             
             return _roomMap[y, x];
         }
-        public int GetRoom(int x, int y)
+        private int GetDoorRoom(int x, int y)
         {
             int a = MapIfCan(x + 1, y);
             int b = MapIfCan(x, y + 1);
@@ -159,9 +159,20 @@ namespace RogueMod
             
             return Math.Max(Math.Max(a, b), Math.Max(c, d)) - 1;
         }
+        public IEntityContainer GetRoom(Vector2I pos)
+        {
+            int v = _roomMap[pos.Y, pos.X];
+            if (v == Corridor)
+            {
+                return CorridorManager;
+            }
+            if (v == NoEntry || v == LockedDoor) { return null; }
+            
+            return Rooms[v - 1];
+        }
         public void UnlockDoor(int x, int y)
         {
-            int i = GetRoom(x, y);
+            int i = GetDoorRoom(x, y);
             Room r = Rooms[i];
             Door d = r.Doors[r.GetDoor(x, y)];
             
@@ -172,7 +183,7 @@ namespace RogueMod
         }
         public void ShowDoor(int x, int y, VirtualScreen scr)
         {
-            int i = GetRoom(x, y);
+            int i = GetDoorRoom(x, y);
             Room r = Rooms[i];
             Door d = r.Doors[r.GetDoor(x, y)];
             
@@ -185,6 +196,38 @@ namespace RogueMod
         }
         
         public bool IsLocked(int x, int y) => _roomMap[y, x] == LockedDoor;
+        
+        public IEntity GetEntity(IEntityContainer ec, Func<IEntity, int> compare)
+        {
+            int best = int.MaxValue;
+            IEntity b = null;
+            
+            foreach (IEntity e in ec)
+            {
+                int l = compare(e);
+                if (l < 0 || l >= best) { continue; }
+                
+                best = l;
+                b = e;
+            }
+            
+            return b;
+        }
+        public Vector2I GetHit(Vector2I pos, Direction dir)
+        {
+            int start = _roomMap[pos.Y, pos.X];
+            int i = 0;
+            
+            Vector2I offset = dir.GetOffset();
+            
+            do
+            {
+                pos += offset;
+                i = MapIfCan(pos.X, pos.Y);
+            } while (i == start);
+            
+            return pos;
+        }
         
         public Room GetRandomRoom() => Rooms[Program.RNG.Next(Rooms.Length)];
     }

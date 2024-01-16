@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using CursesSharp;
+using Zene.Structs;
 
 namespace RogueMod
 {
@@ -72,6 +73,44 @@ namespace RogueMod
             }
             
             return true;
+        }
+        
+        public static bool IsDirection(this int ch)
+        {
+            Direction d = (Direction)ch;
+            
+            return d == Direction.Down ||
+                d == Direction.Up ||
+                d == Direction.Left ||
+                d == Direction.Right ||
+                d == Direction.UpLeft ||
+                d == Direction.UpRight ||
+                d == Direction.DownLeft ||
+                d == Direction.DownRight;
+        }
+        public static Vector2I GetOffset(this Direction d)
+        {
+            switch (d)
+            {
+                case Direction.Down:
+                    return (0, 1);
+                case Direction.Up:
+                    return (0, -1);
+                case Direction.Right:
+                    return (1, 0);
+                case Direction.Left:
+                    return (-1, 0);
+                case Direction.DownRight:
+                    return (1, 1);
+                case Direction.UpLeft:
+                    return (-1, -1);
+                case Direction.UpRight:
+                    return (1, -1);
+                case Direction.DownLeft:
+                    return (-1, 1);
+            }
+            
+            return 0;
         }
     }
 }

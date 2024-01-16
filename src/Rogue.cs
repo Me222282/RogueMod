@@ -195,5 +195,29 @@ namespace RogueMod
                 }
             }
         }
+        
+        public ICharacter GetCharacter(Vector2I pos, Direction dir)
+        {
+            Func<IEntity, int> df = dir switch
+            {
+                Direction.Down => (e => e.Position.X != pos.X ? -1 : e.Position.Y - pos.Y),
+                Direction.Up => (e => e.Position.X != pos.X ? -1 : pos.Y - e.Position.Y),
+                Direction.Right => (e => e.Position.Y != pos.Y ? -1 : e.Position.X - pos.X),
+                Direction.Left => (e => e.Position.Y != pos.Y ? -1 : pos.X - e.Position.X),
+                Direction.UpLeft => (e => e.Position.Y - pos.Y != e.Position.X - pos.X
+                    ? -1 : pos.X - e.Position.X),
+                Direction.DownLeft => (e => e.Position.Y - pos.Y != pos.X - e.Position.X
+                    ? -1 : pos.X - e.Position.X),
+                Direction.UpRight => (e => e.Position.Y - pos.Y != e.Position.X - pos.X
+                    ? -1 : e.Position.X - pos.X),
+                Direction.DownRight => (e => e.Position.Y - pos.Y != pos.X - e.Position.X
+                    ? -1 : e.Position.X - pos.X),
+                _ => throw new Exception()
+            };
+            
+            return (ICharacter)RoomManager.GetEntity(
+                RoomManager.GetRoom(pos),
+                e => e is not ICharacter ? -1 : df(e) - 1);
+        }
     }
 }
