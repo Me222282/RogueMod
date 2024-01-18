@@ -4,22 +4,26 @@ using Zene.Structs;
 
 namespace RogueMod
 {
-    public class Room : IEntityContainer
+    public class Room : IRoom
     {
         public Room(RectangleI bounds, bool dark, Door[] doors)
         {
             Bounds = bounds;
+            InnerBounds = new RectangleI(Bounds.X + 1, Bounds.Y + 1, Bounds.Width - 2, Bounds.Height - 2);
             Dark = dark;
             Doors = doors;
         }
         
         public bool Dark { get; set; }
         public RectangleI Bounds { get; }
+        public RectangleI InnerBounds { get; }
         
-        public LinkedList<IEntity> Entities { get; } = new LinkedList<IEntity>();
         public Door[] Doors { get; }
+        public int DoorCount => Doors.Length;
         
-        public void Render(VirtualScreen scr, bool viewEntities)
+        public Door this[int index] => Doors[index];
+        
+        public void Render(IOutput scr)
         {
             scr.RenderBoxD(Bounds);
             
@@ -27,52 +31,12 @@ namespace RogueMod
             {
                 Door r = Doors[i];
                 if (r.Hidden) { continue; }
-                r.Draw(this, scr);
+                Vector2I pos = r.GetLocation(this);
+                scr.Write(pos.X, pos.Y, Draw.Door);
             }
             
-            scr.Fill(Bounds.X + 1, Bounds.Y + 1,
-                Bounds.Width - 2, Bounds.Height - 2,
-                (char)Draw.Floor);
-            
-            if (viewEntities)
-            {
-                RenderEntites(scr, true);
-            }
+            scr.Fill(InnerBounds, (char)Draw.Floor);
         }
-        public void RenderEntites(VirtualScreen scr, bool visible)
-        {
-            if (visible)
-            {
-                foreach (IEntity e in Entities)
-                {
-                    e.Draw(scr);
-                }
-                return;
-            }
-            
-            Draw replace = Dark ? (Draw)' ' : Draw.Floor;
-            
-            foreach (IEntity e in Entities)
-            {
-                scr.Write(e.Position.X, e.Position.Y, replace);
-            }
-        }
-        public bool Enter(IEntity entity)
-        {
-            if (entity is ItemEntity)
-            {
-                ItemEntity ie = GetItemEntity(entity.Position.X, entity.Position.Y);
-                if (ie is not null) { return false; }
-            }
-            Entities.Add(entity);
-            return true;
-        }
-        public void PlaceItem(ItemEntity item)
-        {
-            item.Position = GetNextPosition();
-            Entities.Add(item);
-        }
-        public void Leave(IEntity entity) => Entities.Remove(entity);
         
         public Vector2I GetDoor(int index)
         {
@@ -105,38 +69,11 @@ namespace RogueMod
             return x == Bounds.X || x == Bounds.Right ||
                 y == Bounds.Y || y == (Bounds.Y + Bounds.Height);
         }
-        public bool IsEntity(int x, int y)
-            => Entities.Exists(e => e.Position.X == x && e.Position.Y == y);
-        public bool SeeEntity(int x, int y)
-        {
-            foreach (IEntity e in Entities)
-            {
-                if (e.Position.X != x || e.Position.Y != y) { continue; }
-                e.Seen = true;
-                return true;
-            }
-            
-            return false;
-        }
-        public ItemEntity GetItemEntity(int x, int y)
-        {
-            foreach (IEntity e in Entities)
-            {
-                if (e is not ItemEntity ie ||
-                    e.Position.X != x || e.Position.Y != y) { continue; }
-                return ie;
-            }
-            
-            return null;
-        }
         
-        public Vector2I GetNextPosition()
+        /*
+        public Vector2I GetRandomPosition()
         {
-            RectangleI innerBounds = new RectangleI(
-                Bounds.X + 1,
-                Bounds.Y + 1,
-                Bounds.Width - 2,
-                Bounds.Height - 2);
+            RectangleI innerBounds = InnerBounds;
             int x = 0, y = 0;
             do
             {
@@ -146,9 +83,9 @@ namespace RogueMod
             while (IsEntity(x, y));
             
             return (x, y);
-        }
+        }*/
         
-        public IEnumerator<IEntity> GetEnumerator() => Entities.GetEnumerator();
-        IEnumerator IEnumerable.GetEnumerator() => Entities.GetEnumerator();
+        public IEnumerator<Door> GetEnumerator() => (IEnumerator<Door>)Doors.GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator() => Doors.GetEnumerator();
     }
 }

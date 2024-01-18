@@ -58,11 +58,13 @@ namespace RogueMod
         
         public int Value => _values[(int)RingType];
         
+        char IEntity.Graphic => (char)Draw.Ring;
+        
         public bool Cursed { get; set; }
         public int Quantity { get; set; } = 1;
         public bool Stackable => false;
 
-        public string ToString(Rogue game, bool plural)
+        public string ToString(IRogue game, bool plural)
         {
             string p = plural ? "s" : "";
             string name = game.NameMaps.Rings[(int)RingType];
@@ -89,15 +91,15 @@ namespace RogueMod
                 ring == RingType.AddHitChance;
         }
         
-        public bool IsKnown(Rogue game) => game.Discoveries.Rings[(int)RingType];
-        public void MakeKnown(Rogue game)
+        public bool IsKnown(IRogue game) => game.Discoveries.Rings[(int)RingType];
+        public void MakeKnown(IRogue game)
         {
             game.Discoveries.Rings[(int)RingType] = true;
         }
         
         public IItem Copy() => new Ring(RingType);
         
-        public void Effect(ICharacter character, Rogue game)
+        public void Effect(ICharacter character, IRogue game)
         {
             throw new NotImplementedException();
         }

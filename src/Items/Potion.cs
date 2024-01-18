@@ -56,11 +56,13 @@ namespace RogueMod
         
         public int Value => _values[(int)PotionType];
         
+        char IEntity.Graphic => (char)Draw.Potion;
+        
         public bool Cursed { get; set; }
         public int Quantity { get; set; } = 1;
         public bool Stackable => true;
 
-        public string ToString(Rogue game, bool plural)
+        public string ToString(IRogue game, bool plural)
         {
             string p = plural ? "s" : "";
             string name = game.NameMaps.Potions[(int)PotionType];
@@ -79,13 +81,13 @@ namespace RogueMod
             return $"{name} potion";
         }
         
-        public bool IsKnown(Rogue game) => game.Discoveries.Potions[(int)PotionType];
-        public void MakeKnown(Rogue game)
+        public bool IsKnown(IRogue game) => game.Discoveries.Potions[(int)PotionType];
+        public void MakeKnown(IRogue game)
         {
             game.Discoveries.Potions[(int)PotionType] = true;
         }
 
-        public void Effect(ICharacter character, Rogue game)
+        public void Effect(ICharacter character, IRogue game)
         {
             throw new NotImplementedException();
         }

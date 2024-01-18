@@ -1,3 +1,5 @@
+using Zene.Structs;
+
 namespace RogueMod
 {
     public enum EntityFlags
@@ -21,7 +23,7 @@ namespace RogueMod
         CanConfuse      = 0x8000
     }
     
-    public interface ICharacter : IEntity, IDisplayable
+    public interface ICharacter : IEntity
     {
         public double HP { get; set; }
         public int Level { get; }
@@ -31,6 +33,9 @@ namespace RogueMod
         public bool PickupItems { get; }
         
         public Backpack Backpack { get; }
+        
+        bool IEntity.Character => true;
+        public Vector2I Position { get; set; }
         
         public void Action(Rogue game);
     }

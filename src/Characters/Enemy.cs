@@ -18,8 +18,6 @@ namespace RogueMod
         public double HP { get; set; }
         public double MaxHp { get; set; }
         
-        public bool Seen { get; set; }
-        
         public double Strength { get; set; } = 1;
         public int BaseArmour { get; set; }
         public int ArmourClass
@@ -42,10 +40,9 @@ namespace RogueMod
         
         public Backpack Backpack { get; }
         
-        public Vector2I Position { get; set; }
         public char Graphic { get; }
-        public char UnderChar { get; set; }
-
+        public Vector2I Position { get; set; }
+        
         public abstract void Action(Rogue game);
     }
 }

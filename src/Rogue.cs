@@ -16,28 +16,28 @@ namespace RogueMod
         DownLeft = Keys.END
     }
     
-    public class Rogue
+    public class Rogue : IRogue
     {
         public Rogue(Vector2I size)
         {
             PlayingSize = size - (0, 3);
-            Out = new VirtualScreen(size);
+            Out = new GameOutput(size, 2);
             
             RoomManager = new RoomManager(PlayingSize);
+            CorridorManager = RoomManager.CorridorManager;
             
             Player = new Player();
-            RoomManager.GenRooms(1);
-            Out.FillCorridors(RoomManager.CorridorManager);
+            RoomManager.GenerateRooms(1, this);
+            Out.FillCorridorMap(CorridorManager, 1);
             
-            Room playerRoom = RoomManager.GetRandomRoom();
-            Player.Position = playerRoom.GetNextPosition();
-            playerRoom.Entities.Add(Player);
+            CurrentRoom = RoomManager.GetRandomRoom();
+            Vector2I pos = this.GetRandomPosition(CurrentRoom);
+            EntityManager.Place(pos, Player);
             Eluminate(Player.Position.X, Player.Position.Y, true);
-            CurrentRoom = playerRoom;
-            Eluminate(playerRoom);
+            Eluminate(CurrentRoom);
         }
         
-        public VirtualScreen Out { get; }
+        public IGameOutput Out { get; }
         
         public Vector2I PlayingSize { get; }
         public string PlayerName { get; set; } = "";
@@ -45,45 +45,51 @@ namespace RogueMod
         public Discoveries Discoveries { get; } = new Discoveries();
         public Mapping NameMaps { get; } = new Mapping();
         
-        public RoomManager RoomManager { get; }
+        public IRoomManager RoomManager { get; }
+        public ICorridorManager CorridorManager { get; }
+        public IEntityManager EntityManager { get; }
         public Player Player { get; }
-        public IEntityContainer CurrentRoom { get; private set; }
+        public IRoom CurrentRoom { get; private set; }
         
         public void Render()
         {
             Stdscr.Clear();
-            for (int i = 0; i < RoomManager.Rooms.Length; i++)
+            foreach (IRoom r in RoomManager)
             {
-                Room r = RoomManager.Rooms[i];
-                r.Render(Out, r == CurrentRoom);
+                r.Render(Out[0]);
             }
-            RoomManager.CorridorManager.Render(Out, false);
+            
+            CorridorManager.Render(Out[0]);
+            //EntityManager.Render(Out[1], Out[2], new RectangleI((0, 0), PlayingSize));
         }
-        public bool TryMoveCharacter(int x, int y, ICharacter character, out IEntityContainer room)
+        public bool TryMoveCharacter(int x, int y, ICharacter character)
         {
             Vector2I oldPos = character.Position;
-            bool success = RoomManager.TryMoveEntity(x, y, character, out room);
+            LocationProperties lp = RoomManager.GetProperties(x, y);
+            bool success =  lp.CanEnter;
+            ICharacter hit = EntityManager.GetCharacter(x, y);
+            success |= hit is not null && hit.Character;
             if (!success) { return false; }
+            
+            EntityManager.Shift(oldPos, (x, y));
             
             if (character.PickupItems && !character.Backpack.IsFull)
             {
-                ItemEntity item = room.GetItemEntity(x, y);
-                if (item != null)
+                IItem item = EntityManager.GetItem(x, y);
+                if (item is not null)
                 {
                     if (character is Player)
                     {
                         Program.Message.Push("you gained an item");
                     }
                     
-                    character.Backpack.Add(item.Item);
-                    room.Leave(item);
-                    item.UnDraw(Out);
+                    character.Backpack.Add(item);
+                    EntityManager.Delete(x, y, 0);
                 }
             }
             
-            Out.Write(oldPos.X, oldPos.Y, character.UnderChar);
-            character.UnderChar = Out.Read(x, y);
-            Out.Write(x, y, character.Graphic);
+            Out[1].Write(oldPos.X, oldPos.Y, ' ');
+            Out[1].Write(x, y, character.Graphic);
             
             return true;
         }
@@ -112,20 +118,18 @@ namespace RogueMod
                 return false;
             }
             
-            bool success = TryMoveCharacter(x, y, Player, out IEntityContainer newRoom);
+            bool success = TryMoveCharacter(x, y, Player);
+            LocationProperties lp = RoomManager.GetProperties(x, y);
             if (!success)
             {
-                if (!RoomManager.IsLocked(x, y))
-                {
-                    return false;                    
-                }
+                if (!lp.IsLocked) { return false; }
                 if (!Player.Backpack.DropOne(new Key()))
                 {
                     Program.Message.Push(Messages.DoorLocked);
                     return false;
                 }
                 
-                RoomManager.UnlockDoor(x, y);
+                RoomManager.UnlockDoor(x, y, Out[0]);
                 
                 Program.Message.Push(Messages.UnlockedDoor);
                 return false;
@@ -138,16 +142,25 @@ namespace RogueMod
             // Eluminate new position - always incase standing in doorway
             Eluminate(x, y, true);
             
+            IRoom newRoom = lp.Room;
+            
             if (CurrentRoom != newRoom)
             {
-                // Render old room without entities
-                CurrentRoom.RenderEntites(Out, false);
+                // Hide entities in old room
+                if (CurrentRoom is not null)
+                {
+                    Out[1].Fill(CurrentRoom.Bounds, ' ');
+                }
                 
                 CurrentRoom = newRoom;
-                Eluminate(newRoom as Room);
                 
-                // Render new room with entites
-                newRoom.RenderEntites(Out, true);
+                if (newRoom is not null)
+                {
+                    Eluminate(newRoom);
+                    
+                    // Render entities in new room
+                    EntityManager.Render(newRoom.Bounds, Out[1]);
+                }
             }
             
             return true;
@@ -161,30 +174,26 @@ namespace RogueMod
             {
                 for (int i2 = Math.Max(0, x - 1); i2 <= max2; i2++)
                 {
-                    Out[i2, i1] = !(!value && RoomManager.Eluminatable(i2, i1));
+                    LocationProperties lp = RoomManager.GetProperties(i2, i1);
+                    
+                    if (value && lp.ShouldEluminate)
+                    {
+                        Out[i2, i1] = true;
+                        continue;
+                    }
+                    if (!value && lp.ShouldHide)
+                    {
+                        Out[i2, i1] = false;
+                        continue;
+                    }
                 }
             }
         }
-        public void Eluminate(Room room)
+        public void Eluminate(IRoom room)
         {
             if (room is null) { return; }
             
-            if (room.Dark)
-            {
-                // Show previously seen entities
-                foreach (IEntity e in room.Entities)
-                {
-                    if (!e.Seen) { continue; }
-                    Out[e.Position.X, e.Position.Y] = true;
-                }
-                return;
-            }
-            
-            // All entities have now been seen
-            foreach (IEntity e in room.Entities)
-            {
-                e.Seen = true;
-            }
+            if (room.Dark) { return; }
             
             // Eluminate room
             for (int y = room.Bounds.Y; y < (room.Bounds.Y + room.Bounds.Height); y++)
@@ -194,30 +203,6 @@ namespace RogueMod
                     Out[x, y] = true;
                 }
             }
-        }
-        
-        public ICharacter GetCharacter(Vector2I pos, Direction dir)
-        {
-            Func<IEntity, int> df = dir switch
-            {
-                Direction.Down => (e => e.Position.X != pos.X ? -1 : e.Position.Y - pos.Y),
-                Direction.Up => (e => e.Position.X != pos.X ? -1 : pos.Y - e.Position.Y),
-                Direction.Right => (e => e.Position.Y != pos.Y ? -1 : e.Position.X - pos.X),
-                Direction.Left => (e => e.Position.Y != pos.Y ? -1 : pos.X - e.Position.X),
-                Direction.UpLeft => (e => e.Position.Y - pos.Y != e.Position.X - pos.X
-                    ? -1 : pos.X - e.Position.X),
-                Direction.DownLeft => (e => e.Position.Y - pos.Y != pos.X - e.Position.X
-                    ? -1 : pos.X - e.Position.X),
-                Direction.UpRight => (e => e.Position.Y - pos.Y != e.Position.X - pos.X
-                    ? -1 : e.Position.X - pos.X),
-                Direction.DownRight => (e => e.Position.Y - pos.Y != pos.X - e.Position.X
-                    ? -1 : e.Position.X - pos.X),
-                _ => throw new Exception()
-            };
-            
-            return (ICharacter)RoomManager.GetEntity(
-                RoomManager.GetRoom(pos),
-                e => e is not ICharacter ? -1 : df(e) - 1);
-        }
+        }   
     }
 }

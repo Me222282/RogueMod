@@ -9,53 +9,28 @@ namespace RogueMod
         public static Random RNG = new Random();
         public static MessageManager Message = new MessageManager();
         public static Properties Properties;
+        public static IOutput Output;
         
         private static void Main(string[] args)
         {
-            Curses.InitScr();
-            
-            Curses.Echo = false;
-            Curses.CursorVisibility = 0;
-            Stdscr.Keypad = true;
-            Stdscr.Blocking = true;
-            
             Properties = new Properties();
+            Output = new Output(Properties.Size);
+            Out.Output = (Output)Output;
             
-            Out.Init(Properties.Size);
-            Out.InitColours();
-            Stdscr.Clear();
+            Output.Clear();
             
             Splash();
             
             Rogue game = new Rogue(Properties.Size);
-            game.RoomManager.Rooms[0].PlaceItem(new ItemEntity(Ring.Create()));
-            game.RoomManager.Rooms[0].PlaceItem(new ItemEntity(Ring.Create()));
-            game.RoomManager.Rooms[0].PlaceItem(new ItemEntity(Scroll.Create()));
-            game.RoomManager.Rooms[0].PlaceItem(new ItemEntity(Scroll.Create()));
-            game.RoomManager.Rooms[0].PlaceItem(new ItemEntity(Staff.Create(game)));
-            game.RoomManager.Rooms[0].PlaceItem(new ItemEntity(Staff.Create(game)));
-            game.RoomManager.Rooms[0].PlaceItem(new ItemEntity(Potion.Create()));
-            game.RoomManager.Rooms[0].PlaceItem(new ItemEntity(Potion.Create()));
-            game.RoomManager.Rooms[0].PlaceItem(new ItemEntity(new Gold(100)));
-            game.RoomManager.Rooms[0].PlaceItem(new ItemEntity(new Gold(30)));
-            game.RoomManager.Rooms[0].PlaceItem(new ItemEntity(Food.Create()));
-            game.RoomManager.Rooms[0].PlaceItem(new ItemEntity(Food.Create()));
-            game.RoomManager.Rooms[0].PlaceItem(new ItemEntity(Weapon.Create()));
-            game.RoomManager.Rooms[0].PlaceItem(new ItemEntity(Weapon.Create()));
-            game.RoomManager.Rooms[0].PlaceItem(new ItemEntity(Armour.Create()));
-            game.RoomManager.Rooms[0].PlaceItem(new ItemEntity(Armour.Create()));
-            game.RoomManager.Rooms[0].PlaceItem(new ItemEntity(new Key()));
-            game.RoomManager.Rooms[0].PlaceItem(new ItemEntity(new Key()));
-            game.RoomManager.Rooms[0].PlaceItem(new ItemEntity(new Amulet()));
             
             game.Render();
             
             Curtain(game);
-            game.Out.PrintDirect = true;
+            game.Out.DirectOut = Output;
             
             while (true)
-            {
-                int cki = Stdscr.GetChar();
+            {                
+                int cki = Output.ReadKeyInput();
                 if (cki == 'Q')
                 {
                     if (IsQuit()) { break; }
@@ -67,23 +42,21 @@ namespace RogueMod
                 ManageKeyInput(cki, game);
                 Message.Manage();
             }
-            
-            Curses.EndWin();
         }
         private static bool IsQuit()
         {
             Out.ColourNormal();
-            Stdscr.Add(0, 0, "Do you wish to end your quest now (");
+            Output.Write(0, 0, "Do you wish to end your quest now (");
             Out.InvertColours();
-            Stdscr.Add('Y');
+            Output.Append('Y');
             Out.InvertColours();
-            Stdscr.Add("es/");
+            Output.Append("es/");
             Out.InvertColours();
-            Stdscr.Add('N');
+            Output.Append('N');
             Out.InvertColours();
-            Stdscr.Add("o) ?");
+            Output.Append("o) ?");
             
-            int cki = Stdscr.GetChar();
+            int cki = Output.ReadKeyInput();
             Stdscr.Move(0, 0);
             Stdscr.ClearToEol();
             return char.ToLower((char)cki) == 'y';
@@ -117,12 +90,12 @@ namespace RogueMod
                 case Controls.ControlVis:
                     Stdscr.Clear();
                     Out.PrintList(Messages.ControlVisual, (Out.Width / 2) < 37, Out.DefaultOnChar);
-                    game.Out.Print();
+                    game.Out.PrintAll();
                     return;
                 case Controls.SymbolVis:
                     Stdscr.Clear();
                     Out.PrintList(Messages.SymbolVisual, (Out.Width / 2) < 37, Out.DefaultOnChar);
-                    game.Out.Print();
+                    game.Out.PrintAll();
                     return;
                 case Controls.Inventory:
                     PlayerActions.SelectItemChar(game, ItemType.Any);

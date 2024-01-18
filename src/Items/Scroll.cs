@@ -61,8 +61,10 @@ namespace RogueMod
         public bool Stackable => true;
 
         public int Value => _values[(int)ScrollType];
-
-        public string ToString(Rogue game, bool plural)
+        
+        char IEntity.Graphic => (char)Draw.Scroll;
+        
+        public string ToString(IRogue game, bool plural)
         {
             string p = plural ? "s" : "";
             string name = game.NameMaps.Scrolls[(int)ScrollType];
@@ -81,13 +83,13 @@ namespace RogueMod
             return $"scroll{p} titled '{name}'";
         }
         
-        public bool IsKnown(Rogue game) => game.Discoveries.Scrolls[(int)ScrollType];
-        public void MakeKnown(Rogue game)
+        public bool IsKnown(IRogue game) => game.Discoveries.Scrolls[(int)ScrollType];
+        public void MakeKnown(IRogue game)
         {
             game.Discoveries.Scrolls[(int)ScrollType] = true;
         }
         
-        public void Effect(ICharacter character, Rogue game)
+        public void Effect(ICharacter character, IRogue game)
         {
             throw new NotImplementedException();
         }

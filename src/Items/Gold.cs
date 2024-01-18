@@ -21,11 +21,13 @@ namespace RogueMod
         public bool Stackable => true;
         public int Value => 10;
         
-        public void Effect(ICharacter character, Rogue game)
+        char IEntity.Graphic => (char)Draw.Gold;
+        
+        public void Effect(ICharacter character, IRogue game)
              => throw new NotSupportedException();
-        public bool IsKnown(Rogue game) => true;
-        public void MakeKnown(Rogue game) => throw new NotSupportedException();
-        public string ToString(Rogue game, bool plural) => throw new NotSupportedException();
+        public bool IsKnown(IRogue game) => true;
+        public void MakeKnown(IRogue game) => throw new NotSupportedException();
+        public string ToString(IRogue game, bool plural) => throw new NotSupportedException();
         public IItem Copy() => throw new NotSupportedException();
     }
 }

@@ -61,8 +61,10 @@ namespace RogueMod
         public bool Stackable => false;
 
         public int Value => _values[(int)StaffType];
-
-        public string ToString(Rogue game, bool plural)
+        
+        char IEntity.Graphic => (char)Draw.Staff;
+        
+        public string ToString(IRogue game, bool plural)
         {
             string p = plural ? "s" : "";
             string made = game.NameMaps.StickMaterial[(int)StaffType] ? "staff" : "wand";
@@ -82,20 +84,20 @@ namespace RogueMod
             return $"{name} {made}{p}";
         }
 
-        public bool IsKnown(Rogue game) => game.Discoveries.Sticks[(int)StaffType];
-        public void MakeKnown(Rogue game)
+        public bool IsKnown(IRogue game) => game.Discoveries.Sticks[(int)StaffType];
+        public void MakeKnown(IRogue game)
         {
             game.Discoveries.Sticks[(int)StaffType] = true;
         }
         
-        public void Effect(ICharacter character, Rogue game)
+        public void Effect(ICharacter character, IRogue game)
         {
             Uses--;
         }
         
         public IItem Copy() => new Staff(StaffType, Attack, Uses);
         
-        public static Staff Create(Rogue game)
+        public static Staff Create(IRogue game)
         {
             StaffType type = (StaffType)Program.RNG.Next((int)StaffType.MaxValue);
             Damage d = Damage.Default;

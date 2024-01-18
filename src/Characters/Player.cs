@@ -55,14 +55,8 @@ namespace RogueMod
         
         public Backpack Backpack { get; }
 
-        public Vector2I Position { get; set; }
-        public bool Seen
-        {
-            get => true;
-            set { }
-        }
         public char Graphic => (char)Draw.Player;
-        public char UnderChar { get; set; }
+        public Vector2I Position { get; set; }
         
         public int Gold
         {

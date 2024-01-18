@@ -6,7 +6,7 @@ namespace RogueMod
 {
     public static class PlayerActions
     {
-        public static void Drop(Rogue game)
+        public static void Drop(IRogue game)
         {
             IItem item = SelectItem(game, ItemType.Any);
             IItem drop = item.Copy();
@@ -19,13 +19,10 @@ namespace RogueMod
             {
                 game.Player.Backpack.DropOne(item);
             }
-            ItemEntity ie = new ItemEntity(drop, game.Player.Position);
-            ie.UnderChar = game.Player.UnderChar;
-            game.CurrentRoom.Enter(ie);
-            game.Player.UnderChar = ie.Graphic;
+            game.EntityManager.Place(game.Player.Position, drop);
         }
         
-        public static void Wear(Rogue game)
+        public static void Wear(IRogue game)
         {
             if (game.Player.Backpack.IsWearing)
             {
@@ -42,7 +39,7 @@ namespace RogueMod
             }
             catch (Exception) { }
         }
-        public static void Wield(Rogue game)
+        public static void Wield(IRogue game)
         {
             if (game.Player.Backpack.IsWielding && game.Player.Backpack.Wielding.Cursed)
             {
@@ -59,7 +56,7 @@ namespace RogueMod
             }
             catch (Exception) { }
         }
-        public static void TakeOff(Rogue game)
+        public static void TakeOff(IRogue game)
         {
             if (!game.Player.Backpack.IsWearing)
             {
@@ -75,7 +72,7 @@ namespace RogueMod
             char c = game.Player.Backpack.GetChar(oldWear);
             Program.Message.Push($"You used to be wearing {c}) {oldWear.ToString(game, false)}");
         }
-        public static void PutOnRing(Rogue game)
+        public static void PutOnRing(IRogue game)
         {
             if (game.Player.Backpack.IsLeftRing && game.Player.Backpack.IsRightRing)
             {
@@ -121,7 +118,7 @@ namespace RogueMod
             }
             catch (Exception) { }
         }
-        public static void TakeOffRing(Rogue game)
+        public static void TakeOffRing(IRogue game)
         {
             if (!game.Player.Backpack.IsLeftRing && !game.Player.Backpack.IsRightRing)
             {
@@ -151,7 +148,7 @@ namespace RogueMod
             char c = game.Player.Backpack.GetChar(oldWear);
             Program.Message.Push($"You used to be wearing {c}) {oldWear.ToString(game, false)}");
         }
-        public static void Throw(Rogue game)
+        public static void Throw(IRogue game)
         {
             if (game.Player.Backpack.IsEmpty)
             {
@@ -177,24 +174,20 @@ namespace RogueMod
             catch (Exception) { }
             if (item is null) { return; }
             
-            ICharacter hit = game.GetCharacter(game.Player.Position, (Direction)ch);
-            Vector2I hitPos;
-            if (hit == null)
-            {
-                hitPos = game.RoomManager.GetHit(game.Player.Position, (Direction)ch);
-            }
-            else
+            Vector2I hitPos = game.RoomManager.GetHitCast(game.Player.Position, (Direction)ch);
+            ICharacter hit = game.EntityManager.GetHitCast(game.Player.Position, (Direction)ch, hitPos);
+            if (hit is not null)
             {
                 hitPos = hit.Position;
             }
             hitPos -= ((Direction)ch).GetOffset();
             
             game.Player.Backpack.DropOne(item);
-            char graphic = new ItemEntity(item).Graphic;
+            char graphic = item.Graphic;
             
         }
         
-        public static IItem SelectItem(Rogue game, ItemType type)
+        public static IItem SelectItem(IRogue game, ItemType type)
         {
             char c = SelectItemChar(game, type);
             if (c == '\0') { return null; }
@@ -213,7 +206,7 @@ namespace RogueMod
             
             return item;
         }
-        public static char SelectItemChar(Rogue game, ItemType type)
+        public static char SelectItemChar(IRogue game, ItemType type)
         {   
             if (game.Player.Backpack.IsEmpty)
             {
@@ -244,11 +237,11 @@ namespace RogueMod
                 
                 return Out.Return.Continue;
             });
-            game.Out.Print();
+            game.Out.PrintAll();
             
             return c;
         }
-        public static char SelectWeaponChar(Rogue game)
+        public static char SelectWeaponChar(IRogue game)
         {   
             if (game.Player.Backpack.IsEmpty)
             {
@@ -280,7 +273,7 @@ namespace RogueMod
                 
                 return Out.Return.Continue;
             });
-            game.Out.Print();
+            game.Out.PrintAll();
             
             return c;
         }

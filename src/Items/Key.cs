@@ -13,14 +13,16 @@ namespace RogueMod
 
         public int Value => 500;
         
-        public string ToString(Rogue game, bool plural)
+        char IEntity.Graphic => (char)Draw.Key;
+        
+        public string ToString(IRogue game, bool plural)
         {
             string p = plural ? "s" : "";
             return $"key{p}";
         }
         
-        public bool IsKnown(Rogue game) => true;
-        public void MakeKnown(Rogue game) { }
+        public bool IsKnown(IRogue game) => true;
+        public void MakeKnown(IRogue game) { }
         
         public override bool Equals(object obj)
         {
@@ -32,7 +34,7 @@ namespace RogueMod
             return HashCode.Combine(Cursed, Quantity);
         }
         
-        public void Effect(ICharacter character, Rogue game)
+        public void Effect(ICharacter character, IRogue game)
         {
             throw new System.NotSupportedException();
         }

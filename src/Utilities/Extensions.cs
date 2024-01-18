@@ -24,20 +24,6 @@ namespace RogueMod
         
         public static char RndChar(this string str) => str[Program.RNG.Next(str.Length)];
         
-        public static void Draw(this IEntity e, VirtualScreen scr)
-        {
-            char c = scr.Read(e.Position.X, e.Position.Y);
-            // Already drawn
-            if (c == e.Graphic) { return; }
-            e.UnderChar = c;
-            
-            scr.Write(e.Position.X, e.Position.Y, e.Graphic);
-        }
-        public static void UnDraw(this IEntity e, VirtualScreen scr)
-        {
-            scr.Write(e.Position.X, e.Position.Y, e.UnderChar);
-        }
-        
         public static void Add<T>(this LinkedList<T> list, T value)
         {
             list.AddLast(new LinkedListNode<T>(value));
@@ -112,5 +98,8 @@ namespace RogueMod
             
             return 0;
         }
+        
+        public static Vector2I GetRandomPosition(this IRogue game, IRoom room)
+            => game.EntityManager.GetRandomPosition(room.InnerBounds);
     }
 }

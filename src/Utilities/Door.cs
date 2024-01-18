@@ -1,3 +1,5 @@
+using Zene.Structs;
+
 namespace RogueMod
 {
     public struct Door
@@ -25,7 +27,7 @@ namespace RogueMod
         public bool Hidden { get; set; }
         public bool Locked { get; set; }
         
-        public void Draw(Room room, VirtualScreen scr)
+        public Vector2I GetLocation(IRoom room)
         {
             int x = 0;
             int y = 0;
@@ -37,7 +39,7 @@ namespace RogueMod
             {
                 x = Location;
             }
-            scr.Write(x + room.Bounds.X, y + room.Bounds.Y, (char)RogueMod.Draw.Door);
+            return (x + room.Bounds.X, y + room.Bounds.Y);
         }
     }
 }

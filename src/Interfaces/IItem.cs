@@ -18,7 +18,7 @@ namespace RogueMod
         Any
     }
     
-    public interface IItem
+    public interface IItem : IEntity
     {
         public ItemType Type { get; }
         public Damage Attack { get; }
@@ -28,13 +28,15 @@ namespace RogueMod
         
         public int Value { get; }
         
-        public bool IsKnown(Rogue game);
-        public void MakeKnown(Rogue game);
+        public bool IsKnown(IRogue game);
+        public void MakeKnown(IRogue game);
         
-        public void Effect(ICharacter character, Rogue game);
-        public string ToString(Rogue game, bool plural);
+        public void Effect(ICharacter character, IRogue game);
+        public string ToString(IRogue game, bool plural);
         
         public IItem Copy();
+        
+        bool IEntity.Character => false;
         
         public class Comparer : IComparer<IItem>
         {

@@ -45,6 +45,8 @@ namespace RogueMod
         
         public int Value => 0;
         
+        char IEntity.Graphic => (char)Draw.Weapon;
+        
         public bool Cursed { get; set; }
         public int Quantity { get; set; } = 1;
         public bool Discovered { get; set; }
@@ -52,7 +54,7 @@ namespace RogueMod
                                 WeaponType == WeaponType.Dart ||
                                 WeaponType == WeaponType.Bolt;
         
-        public string ToString(Rogue game, bool plural)
+        public string ToString(IRogue game, bool plural)
         {
             string discover = "";
             
@@ -65,8 +67,8 @@ namespace RogueMod
             return $"{discover}{_names[(int)WeaponType]}{p}";
         }
         
-        public bool IsKnown(Rogue game) => Discovered;
-        public void MakeKnown(Rogue game) => Discovered = true;
+        public bool IsKnown(IRogue game) => Discovered;
+        public void MakeKnown(IRogue game) => Discovered = true;
 
         public override bool Equals(object obj)
         {
@@ -90,7 +92,7 @@ namespace RogueMod
             return w;
         }
         
-        public void Effect(ICharacter character, Rogue game)
+        public void Effect(ICharacter character, IRogue game)
         {
             throw new NotImplementedException();
         }

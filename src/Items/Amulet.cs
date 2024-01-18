@@ -13,17 +13,19 @@ namespace RogueMod
 
         public int Value => 1000;
         
-        public string ToString(Rogue game, bool plural) => "The Amulet of Yendor";
+        char IEntity.Graphic => (char)Draw.Amulet;
         
-        public bool IsKnown(Rogue game) => true;
-        public void MakeKnown(Rogue game) { }
+        public string ToString(IRogue game, bool plural) => "The Amulet of Yendor";
+        
+        public bool IsKnown(IRogue game) => true;
+        public void MakeKnown(IRogue game) { }
         
         public override bool Equals(object obj) => obj is Amulet a;
         public override int GetHashCode() => HashCode.Combine(Type);
         
         public IItem Copy() => new Amulet();
         
-        public void Effect(ICharacter character, Rogue game)
+        public void Effect(ICharacter character, IRogue game)
         {
             throw new System.NotSupportedException();
         }

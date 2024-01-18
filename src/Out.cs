@@ -1,3 +1,4 @@
+using System;
 using CursesSharp;
 using Zene.Structs;
 
@@ -53,56 +54,11 @@ namespace RogueMod
     
     public static class Out
     {
-        public static void Init(Vector2I size)
-        {
-            Curses.ResizeTerm(size.Y + 1, size.X);
-            Curses.FlushInput();
-            
-            Width = size.X;
-            Height = size.Y;
-            Size = size;
-        }
+        public static Output Output { get; set; }
         
-        public static Vector2I Size { get; private set; }
-        public static int Width { get; private set; }
-        public static int Height { get; private set; }
-        
-        private static ColourF GetColour(int i)
-        {
-            return new ColourF(
-                (2f/3f * (i & 1)/1f) + (1/3f * (i & 8)/8f),
-                ((2f/3f * (i & 2)/2f) + (1/3f * (i & 8)/8f)) / ((i) == 3 ? 2 : 1),
-                (2f/3f * (i & 4)/4f) + (1/3f * (i & 8)/8f)
-            );
-        }
-        internal static void InitColours()
-        {
-            if (!Curses.HasColors) { return; }
-            
-            Curses.StartColor();
-            
-            if (Curses.CanChangeColor)
-            {
-                for (short i = 0; i < 8; i++)
-                {
-                    ColourF t = GetColour(i);
-                    Curses.InitColor(i,
-                        (short)(1000 * t.R),
-                        (short)(1000 * t.G),
-                        (short)(1000 * t.B));
-                }
-            }
-            
-            for (short i = 1; i < 8; ++i)
-            {
-                Curses.InitPair(i, i, 0);
-            }
-            // On grey
-            for (short i = 1; i < 8; ++i)
-            {
-                Curses.InitPair((short)(i + 8), i, 7);
-            }
-        }
+        public static Vector2I Size => Output.Size;
+        public static int Width => Output.Size.X;
+        public static int Height => Output.Size.Y;
         
         public static void SetColour(Colours colour, bool reverse = false)
         {
@@ -273,6 +229,7 @@ namespace RogueMod
                 ' ' => Return.Break,
                 _ => Return.Continue
             };
+        
         public static void PrintList(string[] list, bool vertical, OnChar manager)
         {
             int hw = Width / 2;

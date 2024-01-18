@@ -18,9 +18,11 @@ namespace RogueMod
         public bool Stackable => true;
         public int Value => 1;
         
+        char IEntity.Graphic => (char)Draw.Food;
+        
         public bool FoodType { get; }
         
-        public void Effect(ICharacter character, Rogue game)
+        public void Effect(ICharacter character, IRogue game)
         {
             if (character is Player p)
             {
@@ -28,10 +30,10 @@ namespace RogueMod
             }
         }
 
-        public bool IsKnown(Rogue game) => true;
-        public void MakeKnown(Rogue game) { }
+        public bool IsKnown(IRogue game) => true;
+        public void MakeKnown(IRogue game) { }
 
-        public string ToString(Rogue game, bool plural)
+        public string ToString(IRogue game, bool plural)
         {
             if (FoodType)
             {

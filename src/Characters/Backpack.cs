@@ -122,7 +122,7 @@ namespace RogueMod
                     return "A";
             }
         }
-        public string[] GetItemList(Rogue game)
+        public string[] GetItemList(IRogue game)
         {
             string[] l = new string[_holding.Length];
             
@@ -135,7 +135,7 @@ namespace RogueMod
             
             return l;
         }
-        private string GetItemString(IItem item, Rogue game)
+        private string GetItemString(IItem item, IRogue game)
         {
             bool pl = item.Quantity > 1;
             string value = item.ToString(game, pl);
@@ -166,7 +166,7 @@ namespace RogueMod
             }
             return value + mod;
         }
-        public string[] GetFilteredItemList(Rogue game, ItemType type)
+        public string[] GetFilteredItemList(IRogue game, ItemType type)
         {
             string[] l = new string[_holding.Length];
             
@@ -185,7 +185,7 @@ namespace RogueMod
             
             return l;
         }
-        public string[] GetFilteredItemList(Rogue game, Func<IItem, bool> filter)
+        public string[] GetFilteredItemList(IRogue game, Func<IItem, bool> filter)
         {
             string[] l = new string[_holding.Length];
             

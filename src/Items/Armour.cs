@@ -36,8 +36,10 @@ namespace RogueMod
         public bool Stackable => false;
 
         public int Value => 30 * (ArmourClass + Modifier);
-
-        public string ToString(Rogue game, bool plural)
+        
+        char IEntity.Graphic => (char)Draw.Armour;
+        
+        public string ToString(IRogue game, bool plural)
         {
             string m = "", discover = "";
             
@@ -56,10 +58,10 @@ namespace RogueMod
             return $"{m}{Name} {arm}{discover}";
         }
         
-        public bool IsKnown(Rogue game) => Discovered;
-        public void MakeKnown(Rogue game) => Discovered = true;
+        public bool IsKnown(IRogue game) => Discovered;
+        public void MakeKnown(IRogue game) => Discovered = true;
 
-        public void Effect(ICharacter character, Rogue game) { }
+        public void Effect(ICharacter character, IRogue game) { }
         
         public IItem Copy() => new Armour(Name, ArmourClass) { Modifier = Modifier };
         
