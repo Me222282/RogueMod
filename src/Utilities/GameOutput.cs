@@ -125,18 +125,18 @@ namespace RogueMod
             public Unit(char c, bool grey)
             {
                 Character = c;
-                Attribute = Out.GetAttribute((Draw)c, grey);
+                Attribute = RogueMod.Attribute.GetAttribute((Draw)c, grey);
                 Grey = grey;
             }
             public Unit(Draw d, bool grey)
             {
                 Character = (char)d;
-                Attribute = Out.GetAttribute(d, grey);
+                Attribute = RogueMod.Attribute.GetAttribute(d, grey);
                 Grey = grey;
             }
             
             public char Character;
-            public uint Attribute;
+            public Attribute Attribute;
             public bool Grey;
         }
         
@@ -155,6 +155,8 @@ namespace RogueMod
             
             public Vector2I Size { get; }
             
+            public Attribute DefaultAttribute { get; set; } = Attribute.Normal;
+            
             private int _layer;
             private Unit[,] _map;
             
@@ -166,18 +168,22 @@ namespace RogueMod
             public void Write(int x, int y, Draw ch)
             {
                 Unit u = new Unit(ch, _map[y, x].Grey);
+                if (u.Attribute == Attribute.Normal)
+                {
+                    u.Attribute = DefaultAttribute;
+                }
                 _map[y, x] = u;
                 
                 if (!_source.PrintDirect || !_source.TopLayer(x, y, _layer)) { return; }
                 
                 _source.DirectOut.Write(x, y, u.Character, u.Attribute);
             }
-            public void Write(int x, int y, char ch, uint attribute)
+            public void Write(int x, int y, char ch, Attribute attribute)
             {
                 Unit u = new Unit()
                 {
                     Character = ch,
-                    Attribute = attribute,
+                    Attribute = attribute.Value,
                     Grey = _map[y, x].Grey
                 };
                 _map[y, x] = u;
@@ -193,7 +199,7 @@ namespace RogueMod
                     Write(x + i, y, str[i]);
                 }
             }
-            public void Write(int x, int y, ReadOnlySpan<char> str, uint attribute)
+            public void Write(int x, int y, ReadOnlySpan<char> str, Attribute attribute)
             {
                 for (int i = 0; i < str.Length; i++)
                 {
@@ -230,7 +236,7 @@ namespace RogueMod
             }
             
             public char Read(int x, int y) => _map[y, x].Character;
-            public uint GetAttribute(int x, int y) => _map[y, x].Attribute;
+            //public Attribute GetAttribute(int x, int y) => _map[y, x].Attribute;
             
             public void Fill(RectangleI bounds, char ch)
             {
@@ -261,7 +267,9 @@ namespace RogueMod
             }
             
             public int ReadKeyInput() => _source.DirectOut?.ReadKeyInput() ?? -1;
-
+            public string ReadString(int n) => _source.DirectOut?.ReadString(n);
+            public void Pause(int ms) => _source.DirectOut?.Pause(ms);
+            
             public void Append(char c) => throw new NotSupportedException();
             public void Append(ReadOnlySpan<char> str) => throw new NotSupportedException();
             public void ClearLine(int line) => RenderLineH(0, line, ' ', Size.X);

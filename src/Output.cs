@@ -62,10 +62,10 @@ namespace RogueMod
         public Window Screen { get; }
         public Vector2I Size { get; }
         
-        public uint Attribute
+        public Attribute DefaultAttribute
         {
             get => Screen.Attr;
-            set => Screen.Attr = value;
+            set => Screen.Attr = value.Value;
         }
         
         public void Write(int x, int y, char c)
@@ -74,9 +74,9 @@ namespace RogueMod
             Screen.Move(y, x);
             Screen.AddW(c);
         }
-        public void Write(int x, int y, char c, uint attribute)
+        public void Write(int x, int y, char c, Attribute attribute)
         {
-            Screen.Attr = attribute;
+            Screen.Attr = attribute.Value;
             Screen.Move(y, x);
             Screen.AddW(c);
         }
@@ -96,9 +96,9 @@ namespace RogueMod
                 Screen.AddW(str[i]);
             }
         }
-        public void Write(int x, int y, ReadOnlySpan<char> str, uint attribute)
+        public void Write(int x, int y, ReadOnlySpan<char> str, Attribute attribute)
         {
-            Screen.Attr = attribute;
+            Screen.Attr = attribute.Value;
             Screen.Move(y, x);
             
             for (int i = 0; i < str.Length; i++)
@@ -118,7 +118,7 @@ namespace RogueMod
         
         public void RenderBoxD(int x, int y, int w, int h)
         {
-            Screen.Attr = Out.GetAttribute(Colours.Brown);
+            Screen.Attr = Attribute.Brown.Value;
             Screen.Move(y, x);
             Screen.AddW((char)Draw.WallTL);
             RenderLineH(x + 1, y, (char)Draw.WallH, w - 2);
@@ -163,10 +163,24 @@ namespace RogueMod
         public void Clear() => Screen.Clear();
         
         public int ReadKeyInput() => Screen.GetChar();
+        public string ReadString(int n)
+        {
+            Curses.Echo = true;
+            Curses.CursorVisibility = 1;
+            string str = Screen.GetString(n);
+            Curses.Echo = false;
+            Curses.CursorVisibility = 0;
+            return str;
+        }
         public void ClearLine(int line)
         {
             Screen.Move(line, 0);
             Screen.ClearToEol();
+        }
+        public void Pause(int ms)
+        {
+            Screen.Refresh();
+            Curses.NapMs(ms);
         }
         
         private bool _disposed = false;

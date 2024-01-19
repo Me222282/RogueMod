@@ -1,5 +1,5 @@
 using System;
-using CursesSharp;
+//using CursesSharp;
 using Zene.Structs;
 
 namespace RogueMod

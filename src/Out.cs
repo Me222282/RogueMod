@@ -4,25 +4,6 @@ using Zene.Structs;
 
 namespace RogueMod
 {
-    public enum Colours
-    {
-        Normal,
-        Red,
-        Green,
-        Brown,
-        Blue,
-        Magenta,
-        Cyan,
-        LightGrey,
-        Grey,
-        LightRed,
-        LightGreen,
-        Yellow,
-        LightBlue,
-        LightMagenta,
-        LightCyan,
-        White
-    }
     public enum Draw
     {
         Door = '╬',
@@ -54,12 +35,14 @@ namespace RogueMod
     
     public static class Out
     {
+        /*
         public static Output Output { get; set; }
         
         public static Vector2I Size => Output.Size;
         public static int Width => Output.Size.X;
         public static int Height => Output.Size.Y;
         
+        /*
         public static void SetColour(Colours colour, bool reverse = false)
         {
             Stdscr.Attr = GetAttribute(colour, reverse);
@@ -129,7 +112,7 @@ namespace RogueMod
             
             return Attrs.NORMAL;
         }
-        
+        /*
         public static void Write(int x, int y, char c, bool colour = false, uint attr = Attrs.NORMAL)
         {
             if (colour)
@@ -214,7 +197,7 @@ namespace RogueMod
                 RenderLineH(x, y + i, ch, w, colour);
             }
         }
-        
+        */
         public enum Return
         {
             Continue,

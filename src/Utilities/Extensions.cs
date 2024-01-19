@@ -101,5 +101,22 @@ namespace RogueMod
         
         public static Vector2I GetRandomPosition(this IRogue game, IRoom room)
             => game.EntityManager.GetRandomPosition(room.InnerBounds);
+        
+        public static void Centre(this IOutput ouput, int y, string str, Attribute attr)
+        {
+            ouput.Write((ouput.Size.X - str.Length) / 2, y, str, attr);
+        }
+        public static void RenderBoxS(this IOutput ouput, int x, int y, int w, int h)
+        {
+            ouput.DefaultAttribute = Attribute.Green;
+            ouput.Write(y, x, '┌');
+            ouput.RenderLineH(x + 1, y, '─', w - 2);
+            ouput.Append('┐');
+            ouput.RenderLineV(x, y + 1, '│', h - 2);
+            ouput.RenderLineV(x + w - 1, y + 1, '│', h - 2);
+            ouput.Write(y + h - 1, x, '└');
+            ouput.RenderLineH(x + 1, y + h - 1, '─', w - 2);
+            ouput.Append('┘');
+        }
     }
 }

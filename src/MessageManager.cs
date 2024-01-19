@@ -42,12 +42,12 @@ namespace RogueMod
             
             if (message == null) { return; }
             
-            Output.Write(0, 0, message, Attrs.NORMAL);
+            Output.Write(0, 0, message, Attribute.Normal);
             _lastMessage = message;
             
             if (carry)
             {
-                Out.InvertColours();
+                Output.DefaultAttribute = Attribute.Normal.GetReversed();
                 Output.Append(" More ");
             }
         }

@@ -7,11 +7,13 @@ namespace RogueMod
     {
         public Vector2I Size { get; }
         
+        public Attribute DefaultAttribute { get; set; }
+        
         public void Write(int x, int y, char c);
-        public void Write(int x, int y, char c, uint attribute);
+        public void Write(int x, int y, char c, Attribute attribute);
         public void Write(int x, int y, Draw d);
         public void Write(int x, int y, ReadOnlySpan<char> str);
-        public void Write(int x, int y, ReadOnlySpan<char> str, uint attribute);
+        public void Write(int x, int y, ReadOnlySpan<char> str, Attribute attribute);
         
         public void Append(char c);
         public void Append(ReadOnlySpan<char> str);
@@ -28,6 +30,8 @@ namespace RogueMod
         public void Clear();
         
         public int ReadKeyInput();
+        public string ReadString(int n);
         public void ClearLine(int line);
+        public void Pause(int ms);
     }
 }

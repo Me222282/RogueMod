@@ -46,15 +46,16 @@ namespace RogueMod
         }
         private static bool IsQuit()
         {
-            Out.ColourNormal();
-            Output.Write(0, 0, "Do you wish to end your quest now (");
-            Out.InvertColours();
+            Attribute rev = Attribute.Normal.GetReversed();
+            
+            Output.Write(0, 0, "Do you wish to end your quest now (", Attribute.Normal);
+            Output.DefaultAttribute = rev;
             Output.Append('Y');
-            Out.InvertColours();
+            Output.DefaultAttribute = Attribute.Normal;
             Output.Append("es/");
-            Out.InvertColours();
+            Output.DefaultAttribute = rev;
             Output.Append('N');
-            Out.InvertColours();
+            Output.DefaultAttribute = Attribute.Normal;
             Output.Append("o) ?");
             
             int cki = Output.ReadKeyInput();
@@ -143,71 +144,52 @@ namespace RogueMod
         
         private static string Splash()
         {   
-            Out.RenderBoxD(0, 0, Out.Width, Out.Height);
+            Output.RenderBoxD(0, 0, Out.Width, Out.Height);
             
-            Out.SetColour(Colours.Normal, true);
-            Out.Centre(2, "ROGUE:  The Adventure Game");
-            Out.SetColour(Colours.Magenta);
-            Out.Centre(4, "The game of Rogue was designed by:");
-            Out.SetColour(Colours.White);
-            Out.Centre(6, "Michael Toy and Glenn Wichman");
-            Out.SetColour(Colours.Magenta);
-            Out.Centre(9, "Various implementations by:");
-            Out.SetColour(Colours.White);
-            Out.Centre(11, "Ken Arnold, Jon Lane, Michael Toy and Owen Fraser");
-            Out.SetColour(Colours.Magenta);
-            Out.Centre(14, "Adapted for the IBM PC by:");
-            Out.SetColour(Colours.White);
-            Out.Centre(16, "A.I. Design");
-            Out.SetColour(Colours.Yellow);
-            Out.Centre(19, "(C)Copyright 1985");
-            Out.SetColour(Colours.White);
-            Out.Centre(20, "Epyx Incorporated");
-            Out.SetColour(Colours.Yellow);
-            Out.Centre(21, "All Rights Reserved");
+            Output.Centre(2, "ROGUE:  The Adventure Game", Attribute.Normal.GetReversed());
+            Output.Centre(4, "The game of Rogue was designed by:", Attribute.Magenta);
+            Output.Centre(6, "Michael Toy and Glenn Wichman", Attribute.White);
+            Output.Centre(9, "Various implementations by:", Attribute.Magenta);
+            Output.Centre(11, "Ken Arnold, Jon Lane, Michael Toy and Owen Fraser", Attribute.White);
+            Output.Centre(14, "Adapted for the IBM PC by:", Attribute.Magenta);
+            Output.Centre(16, "A.I. Design", Attribute.White);
+            Output.Centre(19, "(C)Copyright 1985", Attribute.Yellow);
+            Output.Centre(20, "Epyx Incorporated", Attribute.White);
+            Output.Centre(21, "All Rights Reserved", Attribute.Yellow);
             
-            Out.SetColour(Colours.Brown);
-            Stdscr.AddW(22, 0, '╠');
-            Out.RenderLineH(1, 22, (char)Draw.WallH, Out.Width - 2);
-            Stdscr.AddW('╣');
-            Stdscr.Standend();
+            Output.Write(22, 0, '╠', Attribute.Brown);
+            Output.RenderLineH(1, 22, (char)Draw.WallH, Out.Width - 2);
+            Output.Append('╣');
+            //Stdscr.Standend();
             
-            Stdscr.Refresh();
+            //Stdscr.Refresh();
             
-            Stdscr.Add(23, 2, "Rogue's Name? ");
-            Out.SetColour(Colours.White);
-            Curses.Echo = true;
-            Curses.CursorVisibility = 1;
-            string name =  Stdscr.GetString(23);
-            Curses.Echo = false;
-            Curses.CursorVisibility = 0;
-            return name;
+            Output.Write(23, 2, "Rogue's Name? ");
+            Output.DefaultAttribute = Attribute.White;
+            return Output.ReadString(23);
         }
         private static void Curtain(Rogue game)
         {
             int delay = Properties.CurtainTime / Out.Height;
             
-            Out.RenderBoxS(0, 0, Out.Width, Out.Height);
-            Stdscr.Refresh();
-            Curses.NapMs(delay);
+            Output.RenderBoxS(0, 0, Out.Width, Out.Height);
+            Output.Pause(delay);
             
             // Lower curtain
             Out.SetColour(Colours.Yellow);
             for (int l = 1; l < Out.Height - 1; l++)
             {
-                Out.RenderLineH(1, l, (char)Draw.Passage, Out.Width - 2);
-                Stdscr.Refresh();
-                Curses.NapMs(delay);
+                Output.RenderLineH(1, l, (char)Draw.Passage, Out.Width - 2);
+                Output.Pause(delay);
             }
-            Curses.NapMs(delay);
+            Output.Pause(delay);
             
             // Raise curtain
             
             for (int l = Out.Height - 1; l >= 0; l--)
             {
                 game.Out.PrintLine(l);
-                Stdscr.Refresh();
-                Curses.NapMs(delay);
+                Output.Pause(delay);
             }
         }
     }
