@@ -4,7 +4,7 @@ using CursesSharp;
 
 namespace RogueMod
 {
-    public class MessageManager
+    public class MessageManager : IMessageManager
     {
         public MessageManager() { }
         public MessageManager(IOutput o)

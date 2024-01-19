@@ -7,7 +7,7 @@ namespace RogueMod
     public class Program
     {
         public static Random RNG = new Random();
-        public static MessageManager Message = new MessageManager();
+        public static IMessageManager Message;
         public static Properties Properties;
         public static IOutput Output;
         
@@ -16,6 +16,7 @@ namespace RogueMod
             Properties = new Properties();
             Output = new Output(Properties.Size);
             Out.Output = (Output)Output;
+            Message = new MessageManager(Output);
             
             Output.Clear();
             
