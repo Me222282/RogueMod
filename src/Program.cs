@@ -57,8 +57,7 @@ namespace RogueMod
             Output.Append("o) ?");
             
             int cki = Output.ReadKeyInput();
-            Stdscr.Move(0, 0);
-            Stdscr.ClearToEol();
+            Output.ClearLine(0);
             return char.ToLower((char)cki) == 'y';
         }
         

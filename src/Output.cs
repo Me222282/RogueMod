@@ -163,8 +163,11 @@ namespace RogueMod
         public void Clear() => Screen.Clear();
         
         public int ReadKeyInput() => Screen.GetChar();
-        public void MovePointer(int x, int y) => Screen.Move(x, y);
-        public void ClearToEnd() => Screen.ClearToEol();
+        public void ClearLine(int line)
+        {
+            Screen.Move(line, 0);
+            Screen.ClearToEol();
+        }
         
         private bool _disposed = false;
         public void Dispose()

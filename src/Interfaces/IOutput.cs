@@ -28,7 +28,6 @@ namespace RogueMod
         public void Clear();
         
         public int ReadKeyInput();
-        //public void MovePointer(int x, int y);
-        //public void ClearToEnd();
+        public void ClearLine(int line);
     }
 }

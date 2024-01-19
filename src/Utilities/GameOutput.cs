@@ -264,6 +264,7 @@ namespace RogueMod
 
             public void Append(char c) => throw new NotSupportedException();
             public void Append(ReadOnlySpan<char> str) => throw new NotSupportedException();
+            public void ClearLine(int line) => RenderLineH(0, line, ' ', Size.X);
         }
     }
 }

@@ -6,6 +6,14 @@ namespace RogueMod
 {
     public class MessageManager
     {
+        public MessageManager() { }
+        public MessageManager(IOutput o)
+        {
+            Output = o;
+        }
+        
+        public IOutput Output { get; set; }
+        
         private List<string> _messages = new List<string>();
         
         public void Push(string message) => _messages.Add(message);
@@ -34,23 +42,17 @@ namespace RogueMod
             
             if (message == null) { return; }
             
-            Out.ColourNormal();
-            
-            Stdscr.Add(0, 0, message);
+            Output.Write(0, 0, message, Attrs.NORMAL);
             _lastMessage = message;
             
             if (carry)
             {
                 Out.InvertColours();
-                Stdscr.Add(" More ");
+                Output.Append(" More ");
             }
         }
         public void PushLastMessage() => Push(_lastMessage);
         
-        public void Clear()
-        {
-            Stdscr.Move(0, 0);
-            Stdscr.ClearToEol();
-        }
+        public void Clear() => Output.ClearLine(0);
     }
 }
