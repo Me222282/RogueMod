@@ -4,6 +4,35 @@ using Zene.Structs;
 
 namespace RogueMod
 {
+    public enum Draw
+    {
+        Door = '╬',
+        WallV = '║',
+        WallH = '═',
+        WallTL = '╔',
+        WallTR = '╗',
+        WallBL = '╚',
+        WallBR = '╝',
+        Floor = '·',
+        Player = '☺',
+        Food = '♣',
+        Amulet = '♀',
+        Key = '♂',
+        Scroll = '♪',
+        Weapon = '↑',
+        Armour = '◘',
+        Gold = '☼',
+        Staff = 'τ',
+        Potion = '¡',
+        Ring = '○',
+        Passage = '▒',
+        Trap = '♦',
+        Magic = '$',
+        MagicB = '~',
+        PassageB = '▓',
+        Stairs = '≡'
+    }
+    
     public sealed class Output : IOutput, IDisposable
     {
         private static ColourF GetColour(int i)

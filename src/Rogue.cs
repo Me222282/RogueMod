@@ -18,10 +18,11 @@ namespace RogueMod
     
     public class Rogue : IRogue
     {
-        public Rogue(Vector2I size)
+        public Rogue(Vector2I size, IMessageManager messages)
         {
             PlayingSize = size - (0, 3);
             Out = new GameOutput(size, 2);
+            Message = messages;
             
             RoomManager = new RoomManager(PlayingSize);
             CorridorManager = RoomManager.CorridorManager;
@@ -37,10 +38,10 @@ namespace RogueMod
             Eluminate(CurrentRoom);
         }
         
+        private IMessageManager Message { get; }
         public IGameOutput Out { get; }
         
         public Vector2I PlayingSize { get; }
-        public string PlayerName { get; set; } = "";
         
         public Discoveries Discoveries { get; } = new Discoveries();
         public Mapping NameMaps { get; } = new Mapping();
@@ -80,7 +81,7 @@ namespace RogueMod
                 {
                     if (character is Player)
                     {
-                        Program.Message.Push("you gained an item");
+                        Message.Push("you gained an item");
                     }
                     
                     character.Backpack.Add(item);
@@ -125,13 +126,13 @@ namespace RogueMod
                 if (!lp.IsLocked) { return false; }
                 if (!Player.Backpack.DropOne(new Key()))
                 {
-                    Program.Message.Push(Messages.DoorLocked);
+                    Message.Push(Messages.DoorLocked);
                     return false;
                 }
                 
                 RoomManager.UnlockDoor(x, y, Out[0]);
                 
-                Program.Message.Push(Messages.UnlockedDoor);
+                Message.Push(Messages.UnlockedDoor);
                 return false;
             }
             

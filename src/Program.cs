@@ -7,55 +7,14 @@ namespace RogueMod
     public class Program
     {
         public static Random RNG = new Random();
-        public static IMessageManager Message;
         public static Properties Properties;
-        public static IOutput Output;
         
         private static void Main(string[] args)
         {
             Properties = new Properties();
-            Output = new Output(Properties.Size);
-            Message = new MessageManager(Output);
             
-            Output.Clear();
-            
-            Splash();
-            
-            Rogue game = new Rogue(Properties.Size);
-            
-            game.Render();
-            
-            Curtain(game);
-            game.Out.DirectOut = Output;
-            
-            while (true)
-            {                
-                int cki = Output.ReadKeyInput();
-                if (cki == 'Q')
-                {
-                    if (IsQuit()) { break; }
-                    
-                    continue;
-                }
-                
-                Message.Clear();
-                ManageKeyInput(cki, game);
-                Message.Manage();
-            }
-        }
-        private static bool IsQuit()
-        {
-            Attribute rev = Attribute.Normal.GetReversed();
-            
-            Output.Write(0, 0, "Do you wish to end your quest now (", Attribute.Normal);
-            Output.Append('Y', rev);
-            Output.Append("es/", Attribute.Normal);
-            Output.Append('N', rev);
-            Output.Append("o) ?", Attribute.Normal);
-            
-            int cki = Output.ReadKeyInput();
-            Output.ClearLine(0);
-            return char.ToLower((char)cki) == 'y';
+            Program program = new Program();
+            program.Run();
         }
         
         public static string GetMod(int i)
@@ -68,8 +27,50 @@ namespace RogueMod
             return $"+{i}";
         }
         
-        private static int _lastAction;
-        private static void ManageKeyInput(int ch, Rogue game)
+        public Program()
+        {
+            Output = new Output(Properties.Size);
+            Message = new MessageManager(Output);
+        }
+        
+        public IMessageManager Message { get; }
+        public IOutput Output { get; }
+        public IPlayerActions Actions { get; private set; }
+        public IRogue Game { get; private set; }
+        
+        private int _lastAction;
+        
+        public void Run()
+        {
+            Output.Clear();
+            
+            string name = Splash();
+            
+            Game = new Rogue(Properties.Size, Message);
+            Actions = new PlayerActions(Output, Message, Game);
+            
+            Game.Render();
+            
+            Curtain();
+            Game.Out.DirectOut = Output;
+            
+            while (true)
+            {                
+                int cki = Output.ReadKeyInput();
+                if (cki == 'Q')
+                {
+                    if (IsQuit()) { break; }
+                    
+                    continue;
+                }
+                
+                Message.Clear();
+                ManageKeyInput(cki);
+                Message.Manage();
+            }
+        }
+        
+        private void ManageKeyInput(int ch)
         {
             if (ch != Controls.Repeat &&
                 ch != Controls.RepeatB)
@@ -86,37 +87,37 @@ namespace RogueMod
                 case Controls.ControlVis:
                     Stdscr.Clear();
                     Output.PrintList(Messages.ControlVisual, (Output.Size.X / 2) < 37);
-                    game.Out.PrintAll();
+                    Game.Out.PrintAll();
                     return;
                 case Controls.SymbolVis:
                     Stdscr.Clear();
                     Output.PrintList(Messages.SymbolVisual, (Output.Size.X / 2) < 37);
-                    game.Out.PrintAll();
+                    Game.Out.PrintAll();
                     return;
                 case Controls.Inventory:
-                    PlayerActions.SelectItemChar(game, ItemType.Any, Message, Output);
+                    Actions.SelectItemChar(ItemType.Any);
                     return;
                 case Controls.Wear:
-                    PlayerActions.Wear(game, Message, Output);
+                    Actions.Wear();
                     return;
                 case Controls.Wield:
-                    PlayerActions.Wield(game, Message, Output);
+                    Actions.Wield();
                     return;
                 case Controls.TakeOff:
-                    PlayerActions.TakeOff(game, Message);
+                    Actions.TakeOff();
                     return;
                 case Controls.Drop:
-                    PlayerActions.Drop(game, Message, Output);
+                    Actions.Drop();
                     return;
                 case Controls.PutOnRing:
-                    PlayerActions.PutOnRing(game, Message, Output);
+                    Actions.PutOnRing();
                     return;
                 case Controls.RemoveRing:
-                    PlayerActions.TakeOffRing(game, Message, Output);
+                    Actions.TakeOffRing();
                     return;
                 case Controls.RepeatB:
                 case Controls.Repeat:
-                    ManageKeyInput(_lastAction, game);
+                    ManageKeyInput(_lastAction);
                     return;
                 case (int)Direction.Up:
                 case (int)Direction.Down:
@@ -126,18 +127,33 @@ namespace RogueMod
                 case (int)Direction.UpRight:
                 case (int)Direction.DownLeft:
                 case (int)Direction.DownRight:
-                    game.TryMovePlayer((Direction)ch);
+                    Game.TryMovePlayer((Direction)ch);
                     return;
                 case 'l':
-                    Room room = game.CurrentRoom as Room;
+                    Room room = Game.CurrentRoom as Room;
                     if (room is null) { return; }
                     room.Dark = false;
-                    game.Eluminate(room);
+                    ((Rogue)Game).Eluminate(room);
                     return;
             }
         }
         
-        private static string Splash()
+        private bool IsQuit()
+        {
+            Attribute rev = Attribute.Normal.GetReversed();
+            
+            Output.Write(0, 0, "Do you wish to end your quest now (", Attribute.Normal);
+            Output.Append('Y', rev);
+            Output.Append("es/", Attribute.Normal);
+            Output.Append('N', rev);
+            Output.Append("o) ?", Attribute.Normal);
+            
+            int cki = Output.ReadKeyInput();
+            Output.ClearLine(0);
+            return char.ToLower((char)cki) == 'y';
+        }
+        
+        private string Splash()
         {   
             Output.RenderBoxD(0, 0, Output.Size.X, Output.Size.Y);
             
@@ -162,7 +178,7 @@ namespace RogueMod
             Output.Write(23, 2, "Rogue's Name? ");
             return Output.ReadString(23);
         }
-        private static void Curtain(Rogue game)
+        private void Curtain()
         {
             int delay = Properties.CurtainTime / Output.Size.Y;
             
@@ -181,7 +197,7 @@ namespace RogueMod
             
             for (int l = Output.Size.Y - 1; l >= 0; l--)
             {
-                game.Out.PrintLine(l);
+                Game.Out.PrintLine(l);
                 Output.Pause(delay);
             }
         }

@@ -7,7 +7,6 @@ namespace RogueMod
         public IGameOutput Out { get; }
         
         public Vector2I PlayingSize { get; }
-        public string PlayerName { get; set; }
         
         public Discoveries Discoveries { get; }
         public Mapping NameMaps { get; }
@@ -18,6 +17,8 @@ namespace RogueMod
         public ICorridorManager CorridorManager { get; }
         public IEntityManager EntityManager { get; }
         
+        public void Render();
         public bool TryMoveCharacter(int x, int y, ICharacter character);
+        public bool TryMovePlayer(Direction dir);
     }
 }

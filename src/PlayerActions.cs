@@ -4,195 +4,209 @@ using Zene.Structs;
 
 namespace RogueMod
 {
-    public static class PlayerActions
+    public class PlayerActions : IPlayerActions
     {
-        public static void Drop(IRogue game, IMessageManager message, IOutput direct)
+        public PlayerActions(IOutput output, IMessageManager messages, IRogue game)
         {
-            IItem item = SelectItem(game, ItemType.Any, message, direct);
+            _output = output;
+            _message = messages;
+            _game = game;
+        }
+        
+        private IOutput _output;
+        public IOutput Ouput => _output;
+        private IMessageManager _message;
+        public IMessageManager Message => _message;
+        private IRogue _game;
+        public IRogue Game => _game;
+        
+        public void Drop()
+        {
+            IItem item = SelectItem(ItemType.Any);
             IItem drop = item.Copy();
             if (item is null) { return; }
             if (item is Weapon && item.Stackable)
             {
-                game.Player.Backpack.DropAll(item);
+                _game.Player.Backpack.DropAll(item);
             }
             else
             {
-                game.Player.Backpack.DropOne(item);
+                _game.Player.Backpack.DropOne(item);
             }
-            game.EntityManager.Place(game.Player.Position, drop);
+            _game.EntityManager.Place(_game.Player.Position, drop);
         }
         
-        public static void Wear(IRogue game, IMessageManager message, IOutput direct)
+        public void Wear()
         {
-            if (game.Player.Backpack.IsWearing)
+            if (_game.Player.Backpack.IsWearing)
             {
-                message.Push(Messages.AlreadyArmour);
+                _message.Push(Messages.AlreadyArmour);
                 return;
             }
-            char wear = SelectItemChar(game, ItemType.Armour, message, direct);
+            char wear = SelectItemChar(ItemType.Armour);
             try
             {
-                game.Player.Backpack.Wear(wear);
-                IItem w = game.Player.Backpack.Wearing;
-                w.MakeKnown(game);
-                message.Push($"You are now wearing {w.ToString(game, false)}");
+                _game.Player.Backpack.Wear(wear);
+                IItem w = _game.Player.Backpack.Wearing;
+                w.MakeKnown(_game);
+                _message.Push($"You are now wearing {w.ToString(_game, false)}");
             }
             catch (Exception) { }
         }
-        public static void Wield(IRogue game, IMessageManager message, IOutput direct)
+        public void Wield()
         {
-            if (game.Player.Backpack.IsWielding && game.Player.Backpack.Wielding.Cursed)
+            if (_game.Player.Backpack.IsWielding && _game.Player.Backpack.Wielding.Cursed)
             {
-                message.Push(Messages.Cursed);
+                _message.Push(Messages.Cursed);
                 return;
             }
             
-            char wield = SelectWeaponChar(game, message, direct);
+            char wield = SelectWeaponChar();
             try
             {
-                game.Player.Backpack.Wield(wield);
-                IItem w = game.Player.Backpack.Wielding;
-                message.Push($"You are now wielding {w.ToString(game, false)} ({wield})");
+                _game.Player.Backpack.Wield(wield);
+                IItem w = _game.Player.Backpack.Wielding;
+                _message.Push($"You are now wielding {w.ToString(_game, false)} ({wield})");
             }
             catch (Exception) { }
         }
-        public static void TakeOff(IRogue game, IMessageManager message)
+        public void TakeOff()
         {
-            if (!game.Player.Backpack.IsWearing)
+            if (!_game.Player.Backpack.IsWearing)
             {
-                message.Push(Messages.NoArmour);
+                _message.Push(Messages.NoArmour);
                 return;
             }
-            IItem oldWear = game.Player.Backpack.Wearing;
-            if (!game.Player.Backpack.Wear('\0'))
+            IItem oldWear = _game.Player.Backpack.Wearing;
+            if (!_game.Player.Backpack.Wear('\0'))
             {
-                message.Push(Messages.Cursed);
+                _message.Push(Messages.Cursed);
                 return;
             }
-            char c = game.Player.Backpack.GetChar(oldWear);
-            message.Push($"You used to be wearing {c}) {oldWear.ToString(game, false)}");
+            char c = _game.Player.Backpack.GetChar(oldWear);
+            _message.Push($"You used to be wearing {c}) {oldWear.ToString(_game, false)}");
         }
-        public static void PutOnRing(IRogue game, IMessageManager message, IOutput direct)
+        public void PutOnRing()
         {
-            if (game.Player.Backpack.IsLeftRing && game.Player.Backpack.IsRightRing)
+            if (_game.Player.Backpack.IsLeftRing && _game.Player.Backpack.IsRightRing)
             {
-                message.Push(Messages.AllRings);
+                _message.Push(Messages.AllRings);
                 return;
             }
-            char wear = SelectItemChar(game, ItemType.Ring, message, direct);
-            bool left = game.Player.Backpack.IsRightRing;
+            char wear = SelectItemChar(ItemType.Ring);
+            bool left = _game.Player.Backpack.IsRightRing;
             
             IItem select;
             try
             {
-                select = game.Player.Backpack[wear];
+                select = _game.Player.Backpack[wear];
             }
             catch (Exception) { return; }
             
-            if (select == game.Player.Backpack.LeftRing ||
-                select == game.Player.Backpack.RightRing)
+            if (select == _game.Player.Backpack.LeftRing ||
+                select == _game.Player.Backpack.RightRing)
             {
-                message.Push(Messages.AlreadyWearing);
+                _message.Push(Messages.AlreadyWearing);
                 return;
             }
             
-            if (!game.Player.Backpack.IsRightRing && !game.Player.Backpack.IsLeftRing)
+            if (!_game.Player.Backpack.IsRightRing && !_game.Player.Backpack.IsLeftRing)
             {
-                direct.Write(0, 0, "Left hand or right hand? ", Attribute.Normal);
+                _output.Write(0, 0, "Left hand or right hand? ", Attribute.Normal);
                 char ch;
                 do
                 {
-                    ch = Char.ToLower((char)direct.ReadKeyInput());
+                    ch = Char.ToLower((char)_output.ReadKeyInput());
                     if (ch == Keys.ESC) { return; }
                 } while (ch != 'l' && ch != 'r');
                 left = ch == 'l';
-                message.Clear();
+                _message.Clear();
             }
             
             try
             {
-                game.Player.Backpack.WearRing(wear, left);
-                IItem w = left ? game.Player.Backpack.LeftRing : game.Player.Backpack.RightRing;
-                message.Push($"You are now wearing {w.ToString(game, false)} ({wear})");
+                _game.Player.Backpack.WearRing(wear, left);
+                IItem w = left ? _game.Player.Backpack.LeftRing : _game.Player.Backpack.RightRing;
+                _message.Push($"You are now wearing {w.ToString(_game, false)} ({wear})");
             }
             catch (Exception) { }
         }
-        public static void TakeOffRing(IRogue game, IMessageManager message, IOutput direct)
+        public void TakeOffRing()
         {
-            if (!game.Player.Backpack.IsLeftRing && !game.Player.Backpack.IsRightRing)
+            if (!_game.Player.Backpack.IsLeftRing && !_game.Player.Backpack.IsRightRing)
             {
-                message.Push(Messages.NoRings);
+                _message.Push(Messages.NoRings);
                 return;
             }
-            bool left = game.Player.Backpack.IsLeftRing;
-            if (game.Player.Backpack.IsRightRing && game.Player.Backpack.IsLeftRing)
+            bool left = _game.Player.Backpack.IsLeftRing;
+            if (_game.Player.Backpack.IsRightRing && _game.Player.Backpack.IsLeftRing)
             {
-                direct.Write(0, 0, "Left hand or right hand? ", Attribute.Normal);
+                _output.Write(0, 0, "Left hand or right hand? ", Attribute.Normal);
                 char ch;
                 do
                 {
-                    ch = Char.ToLower((char)direct.ReadKeyInput());
+                    ch = Char.ToLower((char)_output.ReadKeyInput());
                     if (ch == Keys.ESC) { return; }
                 } while (ch != 'l' && ch != 'r');
                 left = ch == 'l';
             }
             
-            IItem oldWear = left ? game.Player.Backpack.LeftRing : game.Player.Backpack.RightRing;
-            if (!game.Player.Backpack.WearRing('\0', left))
+            IItem oldWear = left ? _game.Player.Backpack.LeftRing : _game.Player.Backpack.RightRing;
+            if (!_game.Player.Backpack.WearRing('\0', left))
             {
-                message.Push(Messages.Cursed);
+                _message.Push(Messages.Cursed);
                 return;
             }
-            char c = game.Player.Backpack.GetChar(oldWear);
-            message.Push($"You used to be wearing {c}) {oldWear.ToString(game, false)}");
+            char c = _game.Player.Backpack.GetChar(oldWear);
+            _message.Push($"You used to be wearing {c}) {oldWear.ToString(_game, false)}");
         }
-        public static void Throw(IRogue game, IMessageManager message, IOutput direct)
+        public void Throw()
         {
-            if (game.Player.Backpack.IsEmpty)
+            if (_game.Player.Backpack.IsEmpty)
             {
-                message.Push("You are empty handed");
+                _message.Push("You are empty handed");
                 return;
             }
             
-            direct.Write(0, 0, "Pick a direction", Attribute.Normal);
+            _output.Write(0, 0, "Pick a _outpution", Attribute.Normal);
             int ch;
             do
             {
-                ch = direct.ReadKeyInput();
+                ch = _output.ReadKeyInput();
                 if (ch == Keys.ESC) { return; }
             } while (!ch.IsDirection());
             
-            char th = SelectWeaponChar(game, message, direct);
+            char th = SelectWeaponChar();
             IItem item = null;
             try
             {
-                item = game.Player.Backpack[th];
+                item = _game.Player.Backpack[th];
             }
             catch (Exception) { }
             if (item is null) { return; }
             
-            Vector2I hitPos = game.RoomManager.GetHitCast(game.Player.Position, (Direction)ch);
-            ICharacter hit = game.EntityManager.GetHitCast(game.Player.Position, (Direction)ch, hitPos);
+            Vector2I hitPos = _game.RoomManager.GetHitCast(_game.Player.Position, (Direction)ch);
+            ICharacter hit = _game.EntityManager.GetHitCast(_game.Player.Position, (Direction)ch, hitPos);
             if (hit is not null)
             {
                 hitPos = hit.Position;
             }
             hitPos -= ((Direction)ch).GetOffset();
             
-            game.Player.Backpack.DropOne(item);
+            _game.Player.Backpack.DropOne(item);
             char graphic = item.Graphic;
             
         }
         
-        public static IItem SelectItem(IRogue game, ItemType type, IMessageManager message, IOutput direct)
+        public IItem SelectItem(ItemType type)
         {
-            char c = SelectItemChar(game, type, message, direct);
+            char c = SelectItemChar(type);
             if (c == '\0') { return null; }
             
             IItem item = null;
             try
             {
-                item = game.Player.Backpack[c];
+                item = _game.Player.Backpack[c];
             }
             catch (Exception) { }
             
@@ -203,52 +217,52 @@ namespace RogueMod
             
             return item;
         }
-        public static char SelectItemChar(IRogue game, ItemType type, IMessageManager message, IOutput direct)
+        public char SelectItemChar(ItemType type)
         {   
-            if (game.Player.Backpack.IsEmpty)
+            if (_game.Player.Backpack.IsEmpty)
             {
-                message.Push("You are empty handed");
+                _message.Push("You are empty handed");
                 return '\0';
             }
             
             int c = 0;
             
-            string[] list = game.Player.Backpack.GetFilteredItemList(game, type);
+            string[] list = _game.Player.Backpack.GetFilteredItemList(_game, type);
             
             if (list.IsNullFull())
             {
-                message.Push("You don't have anything appropriate");
+                _message.Push("You don't have anything appropriate");
                 return '\0';
             }
             
-            direct.Clear();
-            c = direct.PrintList(list, true, ch => char.IsLetter((char)ch));
-            game.Out.PrintAll();
+            _output.Clear();
+            c = _output.PrintList(list, true, ch => char.IsLetter((char)ch));
+            _game.Out.PrintAll();
             
             return c == ' ' || c == Keys.ESC ? '\0' : (char)c;
         }
-        public static char SelectWeaponChar(IRogue game, IMessageManager message, IOutput direct)
+        public char SelectWeaponChar()
         {   
-            if (game.Player.Backpack.IsEmpty)
+            if (_game.Player.Backpack.IsEmpty)
             {
-                message.Push("You are empty handed");
+                _message.Push("You are empty handed");
                 return '\0';
             }
             
             int c = 0;
             
-            string[] list = game.Player.Backpack.GetFilteredItemList(game,
+            string[] list = _game.Player.Backpack.GetFilteredItemList(_game,
                 i => i.Attack != Damage.Zero);
             
             if (list.IsNullFull())
             {
-                message.Push("You don't have anything appropriate");
+                _message.Push("You don't have anything appropriate");
                 return '\0';
             }
             
-            direct.Clear();
-            c = direct.PrintList(list, true, ch => char.IsLetter((char)ch));
-            game.Out.PrintAll();
+            _output.Clear();
+            c = _output.PrintList(list, true, ch => char.IsLetter((char)ch));
+            _game.Out.PrintAll();
             
             return c == ' ' || c == Keys.ESC ? '\0' : (char)c;
         }
