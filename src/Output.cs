@@ -62,12 +62,6 @@ namespace RogueMod
         public Window Screen { get; }
         public Vector2I Size { get; }
         
-        public Attribute DefaultAttribute
-        {
-            get => Screen.Attr;
-            set => Screen.Attr = value.Value;
-        }
-        
         public void Write(int x, int y, char c)
         {
             //Screen.Attr = Out.GetAttribute((Draw)c, false);
@@ -107,9 +101,15 @@ namespace RogueMod
             }
         }
         
-        public void Append(char c) => Screen.AddW(c);
-        public void Append(ReadOnlySpan<char> str)
+        public void Append(char c, Attribute attribute)
         {
+            Screen.Attr = attribute.Value;
+            Screen.AddW(c);
+        }
+        public void Append(ReadOnlySpan<char> str, Attribute attribute)
+        {
+            Screen.Attr = attribute.Value;
+            
             for (int i = 0; i < str.Length; i++)
             {
                 Screen.AddW(str[i]);
@@ -121,28 +121,31 @@ namespace RogueMod
             Screen.Attr = Attribute.Brown.Value;
             Screen.Move(y, x);
             Screen.AddW((char)Draw.WallTL);
-            RenderLineH(x + 1, y, (char)Draw.WallH, w - 2);
+            RenderLineH(x + 1, y, (char)Draw.WallH, w - 2, Attribute.Brown);
             Screen.AddW((char)Draw.WallTR);
-            RenderLineV(x, y + 1, (char)Draw.WallV, h - 2);
-            RenderLineV(x + w - 1, y + 1, (char)Draw.WallV, h - 2);
+            RenderLineV(x, y + 1, (char)Draw.WallV, h - 2, Attribute.Brown);
+            RenderLineV(x + w - 1, y + 1, (char)Draw.WallV, h - 2, Attribute.Brown);
             Screen.Move(y + h - 1, x);
             Screen.AddW((char)Draw.WallBL);
-            RenderLineH(x + 1, y + h - 1, (char)Draw.WallH, w - 2);
+            RenderLineH(x + 1, y + h - 1, (char)Draw.WallH, w - 2, Attribute.Brown);
             Screen.AddW((char)Draw.WallBR);
         }
         public void RenderBoxD(RectangleI bounds)
             => RenderBoxD(bounds.X, bounds.Y, bounds.Width, bounds.Height);
 
-        public void RenderLineV(int x, int y, char c, int n)
+        public void RenderLineV(int x, int y, char c, int n, Attribute attribute)
         {
+            Screen.Attr = attribute.Value;
+            
             for (int i = 0; i < n; i++)
             {
                 Screen.Move(y + i, x);
                 Screen.AddW(c);
             }
         }
-        public void RenderLineH(int x, int y, char c, int n)
+        public void RenderLineH(int x, int y, char c, int n, Attribute attribute)
         {
+            Screen.Attr = attribute.Value;
             Screen.Move(y, x);
             for (int i = 0; i < n; i++)
             {
@@ -156,7 +159,7 @@ namespace RogueMod
         {
             for (int i = 0; i < bounds.Height; i++)
             {
-                RenderLineH(bounds.X, bounds.Y + i, c, bounds.Width);
+                RenderLineH(bounds.X, bounds.Y + i, c, bounds.Width, Attribute.Normal);
             }
         }
 
@@ -165,6 +168,7 @@ namespace RogueMod
         public int ReadKeyInput() => Screen.GetChar();
         public string ReadString(int n)
         {
+            Screen.Attr = Attribute.White.Value;
             Curses.Echo = true;
             Curses.CursorVisibility = 1;
             string str = Screen.GetString(n);

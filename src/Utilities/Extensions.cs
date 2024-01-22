@@ -108,15 +108,61 @@ namespace RogueMod
         }
         public static void RenderBoxS(this IOutput ouput, int x, int y, int w, int h)
         {
-            ouput.DefaultAttribute = Attribute.Green;
-            ouput.Write(y, x, '┌');
-            ouput.RenderLineH(x + 1, y, '─', w - 2);
-            ouput.Append('┐');
-            ouput.RenderLineV(x, y + 1, '│', h - 2);
-            ouput.RenderLineV(x + w - 1, y + 1, '│', h - 2);
-            ouput.Write(y + h - 1, x, '└');
-            ouput.RenderLineH(x + 1, y + h - 1, '─', w - 2);
-            ouput.Append('┘');
+            ouput.Write(y, x, '┌', Attribute.Green);
+            ouput.RenderLineH(x + 1, y, '─', w - 2, Attribute.Green);
+            ouput.Append('┐', Attribute.Green);
+            ouput.RenderLineV(x, y + 1, '│', h - 2, Attribute.Green);
+            ouput.RenderLineV(x + w - 1, y + 1, '│', h - 2, Attribute.Green);
+            ouput.Write(y + h - 1, x, '└', Attribute.Green);
+            ouput.RenderLineH(x + 1, y + h - 1, '─', w - 2, Attribute.Green);
+            ouput.Append('┘', Attribute.Green);
+        }
+        public static int PrintList(this IOutput ouput, string[] list, bool vertical, Func<int, bool> exit = null)
+        {
+            if (exit is null)
+            {
+                exit = i => false;
+            }
+            
+            int hw = ouput.Size.X / 2;
+            for (int i = 0, j = 0; j < list.Length; i++, j++)
+            {
+                int x = 0;
+                int y = i;
+                if (!vertical)
+                {
+                    x = i % 2 == 0 ? 0 : hw;
+                    y = i / 2;
+                }
+                
+                if (y >= (ouput.Size.Y - 2))
+                {
+                    ouput.Write(ouput.Size.Y - 1, 0, "--Press space for more, Esc to continue--", Attribute.Normal);
+                    while (true)
+                    {
+                        int ch = ouput.ReadKeyInput();
+                        if (ch == Keys.ESC || exit(ch)) { return ch; }
+                        if (ch != ' ') { continue; }
+                        break;
+                    }
+                    Stdscr.Clear();
+                    i = -1;
+                    j--;
+                    continue;
+                }
+                
+                if (list[j] == null) { i--; continue; }
+                
+                ouput.Write(x, y, list[j]);
+            }
+            
+            ouput.Write(ouput.Size.Y - 1, 0, "--Press space to continue--", Attribute.Normal);
+            int ex;
+            do
+            {
+                ex = ouput.ReadKeyInput();
+            } while (ex != Keys.ESC && ex != ' ' && !exit(ex));
+            return ex;
         }
     }
 }

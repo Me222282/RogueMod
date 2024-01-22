@@ -155,42 +155,36 @@ namespace RogueMod
             
             public Vector2I Size { get; }
             
-            public Attribute DefaultAttribute { get; set; } = Attribute.Normal;
-            
             private int _layer;
             private Unit[,] _map;
             
             public bool Populated(int x, int y) => _map[y, x].Character != ' ';
             public void Grey(int x, int y) => _map[y, x].Grey = true;
             
+            // Add one to leave gap for messages
             public void Write(int x, int y, char ch)
                 => Write(x, y, (Draw)ch);
             public void Write(int x, int y, Draw ch)
             {
                 Unit u = new Unit(ch, _map[y, x].Grey);
+                _map[y, x] = u;
+                
+                if (!_source.PrintDirect || !_source.TopLayer(x, y, _layer)) { return; }
+                
+                _source.DirectOut.Write(x, y + 1, u.Character, u.Attribute);
+            }
+            public void Write(int x, int y, char ch, Attribute attribute)
+            {
+                Unit u = new Unit(ch, _map[y, x].Grey);
                 if (u.Attribute == Attribute.Normal)
                 {
-                    u.Attribute = DefaultAttribute;
+                    u.Attribute = attribute;
                 }
                 _map[y, x] = u;
                 
                 if (!_source.PrintDirect || !_source.TopLayer(x, y, _layer)) { return; }
                 
-                _source.DirectOut.Write(x, y, u.Character, u.Attribute);
-            }
-            public void Write(int x, int y, char ch, Attribute attribute)
-            {
-                Unit u = new Unit()
-                {
-                    Character = ch,
-                    Attribute = attribute.Value,
-                    Grey = _map[y, x].Grey
-                };
-                _map[y, x] = u;
-                
-                if (!_source.PrintDirect || !_source.TopLayer(x, y, _layer)) { return; }
-                
-                _source.DirectOut.Write(x, y, u.Character, u.Attribute);
+                _source.DirectOut.Write(x, y + 1, u.Character, u.Attribute);
             }
             public void Write(int x, int y, ReadOnlySpan<char> str)
             {
@@ -220,18 +214,18 @@ namespace RogueMod
             }
             public void RenderBoxD(RectangleI bounds)
                 => RenderBoxD(bounds.X, bounds.Y, bounds.Width, bounds.Height);
-            public void RenderLineV(int x, int y, char c, int n)
+            public void RenderLineV(int x, int y, char c, int n, Attribute attribute = new Attribute())
             {
                 for (int i = 0; i < n; i++)
                 {
-                    Write(x, y + i, c);
+                    Write(x, y + i, c, attribute);
                 }
             }
-            public void RenderLineH(int x, int y, char c, int n)
+            public void RenderLineH(int x, int y, char c, int n, Attribute attribute = new Attribute())
             {
                 for (int i = 0; i < n; i++)
                 {
-                    Write(x + i, y, c);
+                    Write(x + i, y, c, attribute);
                 }
             }
             
@@ -257,7 +251,7 @@ namespace RogueMod
                     for (int x = 0; x < Size.X; x++)
                     {
                         if (!_source.TopLayer(x, y, _layer)) { continue; }
-                        _source.DirectOut.Write(x, y, ' ');
+                        _source.DirectOut.Write(x, y + 1, ' ');
                     }
                 }
             }
@@ -270,8 +264,8 @@ namespace RogueMod
             public string ReadString(int n) => _source.DirectOut?.ReadString(n);
             public void Pause(int ms) => _source.DirectOut?.Pause(ms);
             
-            public void Append(char c) => throw new NotSupportedException();
-            public void Append(ReadOnlySpan<char> str) => throw new NotSupportedException();
+            public void Append(char c, Attribute attribute) => throw new NotSupportedException();
+            public void Append(ReadOnlySpan<char> str, Attribute attribute) => throw new NotSupportedException();
             public void ClearLine(int line) => RenderLineH(0, line, ' ', Size.X);
         }
     }

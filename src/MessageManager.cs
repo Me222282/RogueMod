@@ -47,8 +47,7 @@ namespace RogueMod
             
             if (carry)
             {
-                Output.DefaultAttribute = Attribute.Normal.GetReversed();
-                Output.Append(" More ");
+                Output.Append(" More ", Attribute.Normal.GetReversed());
             }
         }
         public void PushLastMessage() => Push(_lastMessage);
