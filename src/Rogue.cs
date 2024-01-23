@@ -21,14 +21,15 @@ namespace RogueMod
         public Rogue(Vector2I size, IMessageManager messages)
         {
             PlayingSize = size - (0, 3);
-            Out = new GameOutput(size, 2);
+            Out = new GameOutput(size - (0, 1), 2);
             Message = messages;
             
             RoomManager = new RoomManager(PlayingSize);
-            CorridorManager = RoomManager.CorridorManager;
+            EntityManager = new EntityManager(PlayingSize);
             
             Player = new Player();
             RoomManager.GenerateRooms(1, this);
+            CorridorManager = RoomManager.CorridorManager;
             Out.FillCorridorMap(CorridorManager, 1);
             
             CurrentRoom = RoomManager.GetRandomRoom();
@@ -85,7 +86,7 @@ namespace RogueMod
                     }
                     
                     character.Backpack.Add(item);
-                    EntityManager.Delete(x, y, 0);
+                    EntityManager.Delete(x, y, false);
                 }
             }
             

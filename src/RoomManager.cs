@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Zene.Structs;
 
 namespace RogueMod
@@ -221,7 +222,7 @@ namespace RogueMod
             return new LocationProperties(false, mu.CanEnter, mu.Locked, r);
         }
 
-        public IEnumerator<IRoom> GetEnumerator() => (IEnumerator<IRoom>)Rooms.GetEnumerator();
+        public IEnumerator<IRoom> GetEnumerator() => Rooms.Cast<IRoom>().GetEnumerator();
         IEnumerator IEnumerable.GetEnumerator() => Rooms.GetEnumerator();
     }
 }

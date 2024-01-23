@@ -168,14 +168,14 @@ namespace RogueMod
             Output.Centre(20, "Epyx Incorporated", Attribute.White);
             Output.Centre(21, "All Rights Reserved", Attribute.Yellow);
             
-            Output.Write(22, 0, '╠', Attribute.Brown);
+            Output.Write(0, 22, '╠', Attribute.Brown);
             Output.RenderLineH(1, 22, (char)Draw.WallH, Output.Size.X - 2, Attribute.Brown);
             Output.Append('╣', Attribute.Brown);
             //Stdscr.Standend();
             
             //Stdscr.Refresh();
             
-            Output.Write(23, 2, "Rogue's Name? ");
+            Output.Write(2, 23, "Rogue's Name? ", Attribute.Normal);
             return Output.ReadString(23);
         }
         private void Curtain()

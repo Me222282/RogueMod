@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace RogueMod
 {
@@ -28,7 +29,7 @@ namespace RogueMod
             }
         }
         
-        public IEnumerator<Corridor> GetEnumerator() => (IEnumerator<Corridor>)Corridors.GetEnumerator();
+        public IEnumerator<Corridor> GetEnumerator() => Corridors.Cast<Corridor>().GetEnumerator();
         IEnumerator IEnumerable.GetEnumerator() => Corridors.GetEnumerator();
     }
 }

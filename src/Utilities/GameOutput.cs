@@ -10,6 +10,11 @@ namespace RogueMod
             _screens = new Screen[layers];
             _vis = new bool[size.Y - 3, size.X];
             Size = size;
+            
+            for (int i = 0; i < layers; i++)
+            {
+                _screens[i] = new Screen(this, i);
+            }
         }
         
         public IOutput DirectOut { get; set; }
