@@ -64,18 +64,18 @@ namespace RogueMod
         public int Quantity { get; set; } = 1;
         public bool Stackable => false;
 
-        public string ToString(IRogue game, bool plural)
+        public string ToString(Discoveries dics, bool plural)
         {
             string p = plural ? "s" : "";
-            string name = game.NameMaps.Rings[(int)RingType];
+            string name = dics.RingNames[(int)RingType];
             
-            if (IsKnown(game))
+            if (IsKnown(dics))
             {
                 string b = RingBonus(RingType) ? $" {Program.GetMod((int)Mod)}" : "";
                 return $"ring{p} of {_names[(int)RingType]}{b}({name})";
             }
             
-            string playerName = game.Discoveries.RingNames[(int)RingType];
+            string playerName = dics.RingGuesses[(int)RingType];
             if (playerName != null && playerName != "")
             {
                 return $"ring{p} called {playerName}";
@@ -91,10 +91,10 @@ namespace RogueMod
                 ring == RingType.AddHitChance;
         }
         
-        public bool IsKnown(IRogue game) => game.Discoveries.Rings[(int)RingType];
-        public void MakeKnown(IRogue game)
+        public bool IsKnown(Discoveries dics) => dics.IsRings[(int)RingType];
+        public void MakeKnown(Discoveries dics)
         {
-            game.Discoveries.Rings[(int)RingType] = true;
+            dics.IsRings[(int)RingType] = true;
         }
         
         public IItem Copy() => new Ring(RingType);

@@ -54,7 +54,7 @@ namespace RogueMod
                                 WeaponType == WeaponType.Dart ||
                                 WeaponType == WeaponType.Bolt;
         
-        public string ToString(IRogue game, bool plural)
+        public string ToString(Discoveries dics, bool plural)
         {
             string discover = "";
             
@@ -67,8 +67,8 @@ namespace RogueMod
             return $"{discover}{_names[(int)WeaponType]}{p}";
         }
         
-        public bool IsKnown(IRogue game) => Discovered;
-        public void MakeKnown(IRogue game) => Discovered = true;
+        public bool IsKnown(Discoveries dics) => Discovered;
+        public void MakeKnown(Discoveries dics) => Discovered = true;
 
         public override bool Equals(object obj)
         {

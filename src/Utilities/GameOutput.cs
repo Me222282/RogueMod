@@ -8,7 +8,7 @@ namespace RogueMod
         public GameOutput(Vector2I size, int layers)
         {
             _screens = new Screen[layers];
-            _vis = new bool[size.Y - 3, size.X];
+            _vis = new bool[size.Y - 2, size.X];
             Size = size;
             
             for (int i = 0; i < layers; i++)
@@ -36,14 +36,19 @@ namespace RogueMod
                 if (!PrintDirect) { return; }
                 
                 Unit u = value ? GetTop(x, y) : new Unit(' ', false);
-                DirectOut.Write(x, y, u.Character, u.Attribute);
+                WriteDirect(x, y, u.Character, u.Attribute);
             }
         }
-        private bool Visable(int x, int y) => y < 0 || y >= Size.Y - 3 || _vis[y, x];
+        private bool Visable(int x, int y) => y < 0 || y >= Size.Y - 2 || _vis[y, x];
+        
+        private void WriteDirect(int x, int y, char c, Attribute a)
+        {
+            DirectOut.Write(x, y + 1, c, a);
+        }
         
         private bool TopLayer(int x, int y, int layer)
         {
-            for (int i = layer; i < _screens.Length; i++)
+            for (int i = layer + 1; i < _screens.Length; i++)
             {
                 if (!_screens[i].Populated(x, y)) { continue; }
                 
@@ -52,14 +57,42 @@ namespace RogueMod
             
             return true;
         }
+        private bool BottomLayer(int x, int y, int layer)
+        {
+            for (int i = layer - 1; i >= 0; i--)
+            {
+                if (!_screens[i].Populated(x, y)) { continue; }
+                
+                return false;
+            }
+            
+            return true;
+        }
+        private bool PrintLayerBelow(int x, int y, int layer)
+        {
+            for (int i = layer - 1; i >= 0; i--)
+            {
+                Unit u = _screens[i].ReadUnit(x, y);
+                if (u.Character == ' ') { continue; }
+                
+                if (DirectOut is not null)
+                {
+                    DirectOut.Write(x, y + 1, u.Character, u.Attribute);
+                }
+                
+                return true;
+            }
+            
+            return false;
+        }
         private Unit GetTop(int x, int y)
         {
             for (int i = _screens.Length - 1; i >= 0; i--)
             {
-                char c = _screens[i].Read(x, y);
-                if (c == ' ') { continue; }
+                Unit c = _screens[i].ReadUnit(x, y);
+                if (c.Character == ' ') { continue; }
                 
-                return new Unit(c, false);
+                return c;
             }
             
             return new Unit(' ', false);
@@ -69,10 +102,12 @@ namespace RogueMod
         {
             if (!PrintDirect) { return; }
             
+            if (line < 0 || line > Size.Y) { return; }
+            
             for (int i = 0; i < Size.X; i++)
             {
                 Unit u = Visable(i, line) ? GetTop(i, line) : new Unit(' ', false);
-                DirectOut.Write(i, line, u.Character, u.Attribute);
+                DirectOut.Write(i, line + 1, u.Character, u.Attribute);
             }
         }
         public void PrintAll()
@@ -84,7 +119,7 @@ namespace RogueMod
                 for (int x = 0; x < Size.X; x++)
                 {
                     Unit u = Visable(x, y) ? GetTop(x, y) : new Unit(' ', false);
-                    DirectOut.Write(x, y, u.Character, u.Attribute);
+                    DirectOut.Write(x, y + 1, u.Character, u.Attribute);
                 }
             }
         }
@@ -98,7 +133,7 @@ namespace RogueMod
             
             _vis.Fill(false);
             
-            if (PrintDirect) { DirectOut.Fill(new RectangleI(Vector2.Zero, Size), ' '); }
+            if (PrintDirect) { DirectOut.Fill(new RectangleI((0, 1), Size), ' '); }
         }
         
         public void FillCorridorMap(ICorridorManager cm, int layer)
@@ -108,7 +143,6 @@ namespace RogueMod
             foreach (Corridor c in cm)
             {
                 Vector2I pos = c.Position;
-                pos.Y++;
                 
                 for (int j = 0; j < c.Length; j++)
                 {
@@ -145,7 +179,7 @@ namespace RogueMod
             public bool Grey;
         }
         
-        public class Screen : IOutput
+        private class Screen : IOutput
         {
             public Screen(GameOutput source, int layer)
             {
@@ -174,9 +208,10 @@ namespace RogueMod
                 Unit u = new Unit(ch, _map[y, x].Grey);
                 _map[y, x] = u;
                 
-                if (!_source.PrintDirect || !_source.TopLayer(x, y, _layer)) { return; }
+                if (!_source.PrintDirect || !_source._vis[y, x] || !_source.TopLayer(x, y, _layer) ||
+                    ((char)ch == ' ' && _source.PrintLayerBelow(x, y, _layer))) { return; }
                 
-                _source.DirectOut.Write(x, y + 1, u.Character, u.Attribute);
+                _source.WriteDirect(x, y, u.Character, u.Attribute);
             }
             public void Write(int x, int y, char ch, Attribute attribute)
             {
@@ -187,9 +222,10 @@ namespace RogueMod
                 }
                 _map[y, x] = u;
                 
-                if (!_source.PrintDirect || !_source.TopLayer(x, y, _layer)) { return; }
+                if (!_source.PrintDirect || !_source._vis[y, x] || !_source.TopLayer(x, y, _layer) ||
+                    ((char)ch == ' ' && _source.PrintLayerBelow(x, y, _layer))) { return; }
                 
-                _source.DirectOut.Write(x, y + 1, u.Character, u.Attribute);
+                _source.WriteDirect(x, y, u.Character, u.Attribute);
             }
             public void Write(int x, int y, ReadOnlySpan<char> str)
             {
@@ -235,6 +271,7 @@ namespace RogueMod
             }
             
             public char Read(int x, int y) => _map[y, x].Character;
+            public Unit ReadUnit(int x, int y) => _map[y, x];
             //public Attribute GetAttribute(int x, int y) => _map[y, x].Attribute;
             
             public void Fill(RectangleI bounds, char ch)
@@ -256,7 +293,7 @@ namespace RogueMod
                     for (int x = 0; x < Size.X; x++)
                     {
                         if (!_source.TopLayer(x, y, _layer)) { continue; }
-                        _source.DirectOut.Write(x, y + 1, ' ');
+                        _source.WriteDirect(x, y, ' ', Attribute.Normal);
                     }
                 }
             }

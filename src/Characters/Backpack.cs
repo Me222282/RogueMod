@@ -138,7 +138,7 @@ namespace RogueMod
         private string GetItemString(IItem item, IRogue game)
         {
             bool pl = item.Quantity > 1;
-            string value = item.ToString(game, pl);
+            string value = item.ToString(game.Discoveries, pl);
             
             string mod = "";
             if (item.Equals(Wielding))

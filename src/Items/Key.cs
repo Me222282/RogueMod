@@ -15,14 +15,14 @@ namespace RogueMod
         
         char IEntity.Graphic => (char)Draw.Key;
         
-        public string ToString(IRogue game, bool plural)
+        public string ToString(Discoveries dics, bool plural)
         {
             string p = plural ? "s" : "";
             return $"key{p}";
         }
         
-        public bool IsKnown(IRogue game) => true;
-        public void MakeKnown(IRogue game) { }
+        public bool IsKnown(Discoveries dics) => true;
+        public void MakeKnown(Discoveries dics) { }
         
         public override bool Equals(object obj)
         {

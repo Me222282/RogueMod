@@ -19,7 +19,7 @@ namespace RogueMod
             
             public bool Locked
             {
-                get => (Args | RoomManager.Locked) == RoomManager.Locked;
+                get => (Args & RoomManager.Locked) == RoomManager.Locked;
                 set
                 {
                     if (value)
@@ -33,7 +33,7 @@ namespace RogueMod
             }
             public bool Hidden
             {
-                get => (Args | RoomManager.Hidden) == RoomManager.Hidden;
+                get => (Args & RoomManager.Hidden) == RoomManager.Hidden;
                 set
                 {
                     if (value)
@@ -219,7 +219,7 @@ namespace RogueMod
         {
             MapUnit mu = _roomMap[y, x];
             IRoom r = mu.Room > 0 ? Rooms[mu.Room - 1] : null;
-            return new LocationProperties(false, mu.CanEnter, mu.Locked, r);
+            return new LocationProperties(!mu.CanEnter || mu.Door > 0, mu.CanEnter, mu.Locked, r);
         }
 
         public IEnumerator<IRoom> GetEnumerator() => Rooms.Cast<IRoom>().GetEnumerator();

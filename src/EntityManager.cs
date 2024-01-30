@@ -98,8 +98,8 @@ namespace RogueMod
             
             do
             {
-                x = Program.RNG.Next(bounds.Left, bounds.Right + 1);
-                y = Program.RNG.Next(bounds.Y, bounds.Y + bounds.Height + 1);
+                x = Program.RNG.Next(bounds.Left, bounds.Right);
+                y = Program.RNG.Next(bounds.Y, bounds.Y + bounds.Height);
             } while (_map[y, x].Item is not null || _map[y, x].Character is not null);
             
             return (x, y);

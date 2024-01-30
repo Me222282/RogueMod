@@ -15,10 +15,10 @@ namespace RogueMod
         
         char IEntity.Graphic => (char)Draw.Amulet;
         
-        public string ToString(IRogue game, bool plural) => "The Amulet of Yendor";
+        public string ToString(Discoveries dics, bool plural) => "The Amulet of Yendor";
         
-        public bool IsKnown(IRogue game) => true;
-        public void MakeKnown(IRogue game) { }
+        public bool IsKnown(Discoveries dics) => true;
+        public void MakeKnown(Discoveries dics) { }
         
         public override bool Equals(object obj) => obj is Amulet a;
         public override int GetHashCode() => HashCode.Combine(Type);

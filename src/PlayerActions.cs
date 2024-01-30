@@ -48,8 +48,8 @@ namespace RogueMod
             {
                 _game.Player.Backpack.Wear(wear);
                 IItem w = _game.Player.Backpack.Wearing;
-                w.MakeKnown(_game);
-                _message.Push($"You are now wearing {w.ToString(_game, false)}");
+                w.MakeKnown(_game.Discoveries);
+                _message.Push($"You are now wearing {w.ToString(_game.Discoveries, false)}");
             }
             catch (Exception) { }
         }
@@ -66,7 +66,7 @@ namespace RogueMod
             {
                 _game.Player.Backpack.Wield(wield);
                 IItem w = _game.Player.Backpack.Wielding;
-                _message.Push($"You are now wielding {w.ToString(_game, false)} ({wield})");
+                _message.Push($"You are now wielding {w.ToString(_game.Discoveries, false)} ({wield})");
             }
             catch (Exception) { }
         }
@@ -84,7 +84,7 @@ namespace RogueMod
                 return;
             }
             char c = _game.Player.Backpack.GetChar(oldWear);
-            _message.Push($"You used to be wearing {c}) {oldWear.ToString(_game, false)}");
+            _message.Push($"You used to be wearing {c}) {oldWear.ToString(_game.Discoveries, false)}");
         }
         public void PutOnRing()
         {
@@ -127,7 +127,7 @@ namespace RogueMod
             {
                 _game.Player.Backpack.WearRing(wear, left);
                 IItem w = left ? _game.Player.Backpack.LeftRing : _game.Player.Backpack.RightRing;
-                _message.Push($"You are now wearing {w.ToString(_game, false)} ({wear})");
+                _message.Push($"You are now wearing {w.ToString(_game.Discoveries, false)} ({wear})");
             }
             catch (Exception) { }
         }
@@ -158,7 +158,7 @@ namespace RogueMod
                 return;
             }
             char c = _game.Player.Backpack.GetChar(oldWear);
-            _message.Push($"You used to be wearing {c}) {oldWear.ToString(_game, false)}");
+            _message.Push($"You used to be wearing {c}) {oldWear.ToString(_game.Discoveries, false)}");
         }
         public void Throw()
         {
@@ -238,6 +238,7 @@ namespace RogueMod
             _output.Clear();
             c = _output.PrintList(list, true, ch => char.IsLetter((char)ch));
             _game.Out.PrintAll();
+            Message.Clear();
             
             return c == ' ' || c == Keys.ESC ? '\0' : (char)c;
         }
@@ -263,6 +264,7 @@ namespace RogueMod
             _output.Clear();
             c = _output.PrintList(list, true, ch => char.IsLetter((char)ch));
             _game.Out.PrintAll();
+            Message.Clear();
             
             return c == ' ' || c == Keys.ESC ? '\0' : (char)c;
         }

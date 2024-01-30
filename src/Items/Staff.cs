@@ -64,18 +64,18 @@ namespace RogueMod
         
         char IEntity.Graphic => (char)Draw.Staff;
         
-        public string ToString(IRogue game, bool plural)
+        public string ToString(Discoveries dics, bool plural)
         {
             string p = plural ? "s" : "";
-            string made = game.NameMaps.StickMaterial[(int)StaffType] ? "staff" : "wand";
-            string name = game.NameMaps.Sticks[(int)StaffType];
+            string made = dics.StickMaterial[(int)StaffType] ? "staff" : "wand";
+            string name = dics.StickNames[(int)StaffType];
             
-            if (IsKnown(game))
+            if (IsKnown(dics))
             {
                 return $"{made}{p} of {_names[(int)StaffType]}[{Uses} charges]({name})";
             }
             
-            string playerName = game.Discoveries.StickNames[(int)StaffType];
+            string playerName = dics.StickGuesses[(int)StaffType];
             if (playerName != null && playerName != "")
             {
                 return $"{made}{p} called {playerName}";
@@ -84,10 +84,10 @@ namespace RogueMod
             return $"{name} {made}{p}";
         }
 
-        public bool IsKnown(IRogue game) => game.Discoveries.Sticks[(int)StaffType];
-        public void MakeKnown(IRogue game)
+        public bool IsKnown(Discoveries dics) => dics.IsSticks[(int)StaffType];
+        public void MakeKnown(Discoveries dics)
         {
-            game.Discoveries.Sticks[(int)StaffType] = true;
+            dics.IsSticks[(int)StaffType] = true;
         }
         
         public void Effect(ICharacter character, IRogue game)
@@ -101,7 +101,7 @@ namespace RogueMod
         {
             StaffType type = (StaffType)Program.RNG.Next((int)StaffType.MaxValue);
             Damage d = Damage.Default;
-            if (game.NameMaps.StickMaterial[(int)type])
+            if (game.Discoveries.StickMaterial[(int)type])
             {
                 d.Melee = "2d3";
             }

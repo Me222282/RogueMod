@@ -62,17 +62,17 @@ namespace RogueMod
         public int Quantity { get; set; } = 1;
         public bool Stackable => true;
 
-        public string ToString(IRogue game, bool plural)
+        public string ToString(Discoveries dics, bool plural)
         {
             string p = plural ? "s" : "";
-            string name = game.NameMaps.Potions[(int)PotionType];
+            string name = dics.PotionNames[(int)PotionType];
             
-            if (IsKnown(game))
+            if (IsKnown(dics))
             {
                 return $"potion{p} of {_names[(int)PotionType]}({name})";
             }
             
-            string playerName = game.Discoveries.PotionNames[(int)PotionType];
+            string playerName = dics.PotionGuesses[(int)PotionType];
             if (playerName != null && playerName != "")
             {
                 return $"potion{p} called {playerName}({name})";
@@ -81,10 +81,10 @@ namespace RogueMod
             return $"{name} potion";
         }
         
-        public bool IsKnown(IRogue game) => game.Discoveries.Potions[(int)PotionType];
-        public void MakeKnown(IRogue game)
+        public bool IsKnown(Discoveries dics) => dics.IsPotions[(int)PotionType];
+        public void MakeKnown(Discoveries dics)
         {
-            game.Discoveries.Potions[(int)PotionType] = true;
+            dics.IsPotions[(int)PotionType] = true;
         }
 
         public void Effect(ICharacter character, IRogue game)

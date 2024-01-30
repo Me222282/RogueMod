@@ -51,8 +51,8 @@ namespace RogueMod
             
             Game.Render();
             
-            Curtain();
             Game.Out.DirectOut = Output;
+            Curtain();
             
             while (true)
             {                
@@ -88,11 +88,13 @@ namespace RogueMod
                     Stdscr.Clear();
                     Output.PrintList(Messages.ControlVisual, (Output.Size.X / 2) < 37);
                     Game.Out.PrintAll();
+                    Message.Clear();
                     return;
                 case Controls.SymbolVis:
                     Stdscr.Clear();
                     Output.PrintList(Messages.SymbolVisual, (Output.Size.X / 2) < 37);
                     Game.Out.PrintAll();
+                    Message.Clear();
                     return;
                 case Controls.Inventory:
                     Actions.SelectItemChar(ItemType.Any);
@@ -195,11 +197,14 @@ namespace RogueMod
             
             // Raise curtain
             
-            for (int l = Output.Size.Y - 1; l >= 0; l--)
+            for (int l = Game.Out.Size.Y - 1; l >= 0; l--)
             {
                 Game.Out.PrintLine(l);
                 Output.Pause(delay);
             }
+            
+            Message.Clear();
+            Output.Pause(delay);
         }
     }
 }

@@ -30,10 +30,10 @@ namespace RogueMod
             }
         }
 
-        public bool IsKnown(IRogue game) => true;
-        public void MakeKnown(IRogue game) { }
+        public bool IsKnown(Discoveries dics) => true;
+        public void MakeKnown(Discoveries dics) { }
 
-        public string ToString(IRogue game, bool plural)
+        public string ToString(Discoveries dics, bool plural)
         {
             if (FoodType)
             {

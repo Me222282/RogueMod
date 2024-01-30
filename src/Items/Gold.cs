@@ -25,9 +25,9 @@ namespace RogueMod
         
         public void Effect(ICharacter character, IRogue game)
              => throw new NotSupportedException();
-        public bool IsKnown(IRogue game) => true;
-        public void MakeKnown(IRogue game) => throw new NotSupportedException();
-        public string ToString(IRogue game, bool plural) => throw new NotSupportedException();
+        public bool IsKnown(Discoveries dics) => true;
+        public void MakeKnown(Discoveries dics) => throw new NotSupportedException();
+        public string ToString(Discoveries dics, bool plural) => throw new NotSupportedException();
         public IItem Copy() => throw new NotSupportedException();
     }
 }

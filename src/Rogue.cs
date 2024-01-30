@@ -29,8 +29,7 @@ namespace RogueMod
             
             Player = new Player();
             RoomManager.GenerateRooms(1, this);
-            CorridorManager = RoomManager.CorridorManager;
-            Out.FillCorridorMap(CorridorManager, 1);
+            Out.FillCorridorMap(RoomManager.CorridorManager, 1);
             
             CurrentRoom = RoomManager.GetRandomRoom();
             Vector2I pos = this.GetRandomPosition(CurrentRoom);
@@ -45,24 +44,27 @@ namespace RogueMod
         public Vector2I PlayingSize { get; }
         
         public Discoveries Discoveries { get; } = new Discoveries();
-        public Mapping NameMaps { get; } = new Mapping();
         
         public IRoomManager RoomManager { get; }
-        public ICorridorManager CorridorManager { get; }
         public IEntityManager EntityManager { get; }
-        public Player Player { get; }
+        public IPlayer Player { get; }
         public IRoom CurrentRoom { get; private set; }
         
         public void Render()
         {
-            Stdscr.Clear();
+            // Clear layers without vis
+            Out[0].Clear();
+            Out[1].Clear();
+            // Readd corridoor map
+            Out.FillCorridorMap(RoomManager.CorridorManager, 1);
+            
             foreach (IRoom r in RoomManager)
             {
                 r.Render(Out[0]);
             }
             
-            CorridorManager.Render(Out[0]);
-            //EntityManager.Render(Out[1], Out[2], new RectangleI((0, 0), PlayingSize));
+            RoomManager.CorridorManager.Render(Out[0]);
+            EntityManager.Render(new RectangleI((0, 0), PlayingSize), Out[1]);
         }
         public bool TryMoveCharacter(int x, int y, ICharacter character)
         {
@@ -97,18 +99,7 @@ namespace RogueMod
         }
         public bool TryMovePlayer(Direction dir)
         {
-            Vector2I offset = dir switch
-            {
-                Direction.Up => (0, -1),
-                Direction.Down => (0, 1),
-                Direction.Left => (-1, 0),
-                Direction.Right => (1, 0),
-                Direction.UpRight => (1, -1),
-                Direction.DownRight => (1, 1),
-                Direction.UpLeft => (-1, -1),
-                Direction.DownLeft => (-1, 1),
-                _ => throw new Exception()
-            };
+            Vector2I offset = dir.GetOffset();
             
             Vector2I oldPos = Player.Position;
             int x = oldPos.X + offset.X;
@@ -206,5 +197,22 @@ namespace RogueMod
                 }
             }
         }   
+        
+#if DEBUG
+        public static Rogue GetTest(IRoomManager rm, IEntityManager em, IGameOutput o, IMessageManager m, IPlayer p)
+        {
+            return new Rogue(rm, em, o, m, p);
+        }
+        private Rogue(IRoomManager rm, IEntityManager em, IGameOutput o, IMessageManager m, IPlayer p)
+        {
+            PlayingSize = o.Size;
+            Message = m;
+            Out = o;
+            RoomManager = rm;
+            EntityManager = em;
+            CurrentRoom = p is not null ? rm.GetProperties(p.Position.X, p.Position.Y).Room : null;
+            Player = p;
+        }
+#endif
     }
 }

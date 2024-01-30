@@ -2,7 +2,7 @@ using Zene.Structs;
 
 namespace RogueMod
 {
-    public sealed class Player : ICharacter
+    public sealed class Player : IPlayer
     {
         private static readonly string[] _levelNames = new string[]
         {

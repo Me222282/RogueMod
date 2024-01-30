@@ -28,11 +28,11 @@ namespace RogueMod
         
         public int Value { get; }
         
-        public bool IsKnown(IRogue game);
-        public void MakeKnown(IRogue game);
+        public bool IsKnown(Discoveries dics);
+        public void MakeKnown(Discoveries dics);
         
         public void Effect(ICharacter character, IRogue game);
-        public string ToString(IRogue game, bool plural);
+        public string ToString(Discoveries dics, bool plural);
         
         public IItem Copy();
         

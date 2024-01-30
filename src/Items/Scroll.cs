@@ -64,17 +64,17 @@ namespace RogueMod
         
         char IEntity.Graphic => (char)Draw.Scroll;
         
-        public string ToString(IRogue game, bool plural)
+        public string ToString(Discoveries dics, bool plural)
         {
             string p = plural ? "s" : "";
-            string name = game.NameMaps.Scrolls[(int)ScrollType];
+            string name = dics.ScrollNames[(int)ScrollType];
             
-            if (IsKnown(game))
+            if (IsKnown(dics))
             {
                 return $"scroll{p} of {_names[(int)ScrollType]}({name})";
             }
             
-            string playerName = game.Discoveries.StickNames[(int)ScrollType];
+            string playerName = dics.StickGuesses[(int)ScrollType];
             if (playerName != null && playerName != "")
             {
                 return $"scroll{p} called {playerName}";
@@ -83,10 +83,10 @@ namespace RogueMod
             return $"scroll{p} titled '{name}'";
         }
         
-        public bool IsKnown(IRogue game) => game.Discoveries.Scrolls[(int)ScrollType];
-        public void MakeKnown(IRogue game)
+        public bool IsKnown(Discoveries dics) => dics.IsScrolls[(int)ScrollType];
+        public void MakeKnown(Discoveries dics)
         {
-            game.Discoveries.Scrolls[(int)ScrollType] = true;
+            dics.IsScrolls[(int)ScrollType] = true;
         }
         
         public void Effect(ICharacter character, IRogue game)

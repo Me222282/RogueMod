@@ -39,7 +39,7 @@ namespace RogueMod
         
         char IEntity.Graphic => (char)Draw.Armour;
         
-        public string ToString(IRogue game, bool plural)
+        public string ToString(Discoveries dics, bool plural)
         {
             string m = "", discover = "";
             
@@ -58,8 +58,8 @@ namespace RogueMod
             return $"{m}{Name} {arm}{discover}";
         }
         
-        public bool IsKnown(IRogue game) => Discovered;
-        public void MakeKnown(IRogue game) => Discovered = true;
+        public bool IsKnown(Discoveries dics) => Discovered;
+        public void MakeKnown(Discoveries dics) => Discovered = true;
 
         public void Effect(ICharacter character, IRogue game) { }
         

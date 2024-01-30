@@ -33,11 +33,11 @@ namespace RogueMod
         
         public bool Wall { get; }
         public bool CanEnter { get; }
-        public bool IsCorridor => !Wall && Room is not null;
+        public bool IsCorridor => !Wall && Room is null;
         public bool IsLocked { get; }
         public IRoom Room { get; }
         
         public bool ShouldEluminate => Wall || IsCorridor || (Room is not null && Room.Dark);
-        public bool ShouldHide => Room is not null && Room.Dark;
+        public bool ShouldHide => !Wall && Room is not null && Room.Dark;
     }
 }
