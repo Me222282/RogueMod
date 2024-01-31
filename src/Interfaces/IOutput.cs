@@ -22,6 +22,7 @@ namespace RogueMod
         public void RenderLineH(int x, int y, char c, int n, Attribute attribute = new Attribute());
         
         public char Read(int x, int y);
+        public Attribute ReadAttribute(int x, int y);
         
         public void Fill(RectangleI bounds, char c);
         

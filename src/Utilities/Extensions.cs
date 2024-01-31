@@ -171,5 +171,34 @@ namespace RogueMod
                 output.Write(x + i, y, str[i], Attribute.GetAttribute((Draw)str[i]));
             }
         }
+        
+        public static void Animate(this IOutput output, Vector2I start, Vector2I end, char c, Attribute a)
+        {
+            Vector2I diff = end - start;
+            int length = Math.Abs(diff.X) | Math.Abs(diff.Y);
+            diff /= length;
+            
+            Vector2I last = start - diff;
+            char uc = ' ';
+            Attribute ua = 0;
+            for (int i = 0; i < length; i++)
+            {
+                if (i > 0)
+                {
+                    output.Write(last.X, last.Y, uc, ua);
+                }
+                
+                uc = output.Read(start.X, start.Y);
+                ua = output.ReadAttribute(start.X, start.Y);
+                output.Write(start.X, start.Y, c, a);
+                
+                start += diff;
+                last += diff;
+                
+                output.Pause(Program.Properties.ThrowTime);
+            }
+            
+            output.Write(last.X, last.Y, uc, ua);
+        }
     }
 }

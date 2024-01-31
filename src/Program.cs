@@ -121,6 +121,9 @@ namespace RogueMod
                 case Controls.Repeat:
                     ManageKeyInput(_lastAction);
                     return;
+                case Controls.Throw:
+                    Actions.Throw();
+                    return;
                 case (int)Direction.Up:
                 case (int)Direction.Down:
                 case (int)Direction.Left:

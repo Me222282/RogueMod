@@ -52,7 +52,7 @@ namespace RogueMod
         
         public PotionType PotionType { get; }
         public ItemType Type => ItemType.Potion;
-        public Damage Attack => throw new NotImplementedException();
+        public Damage Attack => Damage.Default;
         
         public int Value => _values[(int)PotionType];
         

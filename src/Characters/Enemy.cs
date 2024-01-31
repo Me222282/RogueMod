@@ -43,6 +43,7 @@ namespace RogueMod
         public char Graphic { get; }
         public Vector2I Position { get; set; }
         
-        public abstract void Action(Rogue game);
+        public abstract void Action(IRogue game);
+        public abstract void Damage(IItem source, bool thrown);
     }
 }

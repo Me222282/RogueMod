@@ -168,7 +168,7 @@ namespace RogueMod
                 return;
             }
             
-            _output.Write(0, 0, "Pick a _outpution", Attribute.Normal);
+            _output.Write(0, 0, "Pick a direction", Attribute.Normal);
             int ch;
             do
             {
@@ -185,17 +185,24 @@ namespace RogueMod
             catch (Exception) { }
             if (item is null) { return; }
             
+            Vector2I offset = ((Direction)ch).GetOffset();
             Vector2I hitPos = _game.RoomManager.GetHitCast(_game.Player.Position, (Direction)ch);
-            ICharacter hit = _game.EntityManager.GetHitCast(_game.Player.Position, (Direction)ch, hitPos);
+            ICharacter hit = _game.EntityManager.GetHitCast(_game.Player.Position + offset, (Direction)ch, hitPos);
             if (hit is not null)
             {
-                hitPos = hit.Position;
+                hitPos = hit.Position - offset;
             }
-            hitPos -= ((Direction)ch).GetOffset();
             
             _game.Player.Backpack.DropOne(item);
             char graphic = item.Graphic;
             
+            // Add graphical offset
+            _output.Animate(_game.Player.Position + offset + (0, 1), hitPos + (0, 1),
+                graphic, Attribute.GetAttribute((Draw)graphic));
+            
+            if (hit is null) { return; }
+            
+            hit.Damage(item, true);
         }
         
         public IItem SelectItem(ItemType type)
@@ -247,7 +254,7 @@ namespace RogueMod
             if (_game.Player.Backpack.IsEmpty)
             {
                 _message.Push("You are empty handed");
-                return '\0';
+                return ' ';
             }
             
             int c = 0;
@@ -258,7 +265,7 @@ namespace RogueMod
             if (list.IsNullFull())
             {
                 _message.Push("You don't have anything appropriate");
-                return '\0';
+                return ' ';
             }
             
             _output.Clear();
@@ -266,7 +273,7 @@ namespace RogueMod
             _game.Out.PrintAll();
             Message.Clear();
             
-            return c == ' ' || c == Keys.ESC ? '\0' : (char)c;
+            return c == ' ' || c == Keys.ESC ? ' ' : (char)c;
         }
     }
 }

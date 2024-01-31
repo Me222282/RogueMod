@@ -183,7 +183,13 @@ namespace RogueMod
         }
 
         public char Read(int x, int y) => Screen.ReadOutputCharW(y, x);
-
+        public Attribute ReadAttribute(int x, int y)
+        {
+            uint attr = Screen.ReadOutputAttr(y, x);
+            
+            return new Attribute(attr);
+        }
+        
         public void Fill(RectangleI bounds, char c)
         {
             for (int i = 0; i < bounds.Height; i++)

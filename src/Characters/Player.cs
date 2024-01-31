@@ -74,6 +74,10 @@ namespace RogueMod
             HP += 8;
         }
 
-        public void Action(Rogue game) { }
+        public void Action(IRogue game) { }
+        public void Damage(IItem source, bool thrown)
+        {
+            int init = (thrown ? source.Attack.Range : source.Attack.Melee).NewRoll();
+        }
     }
 }

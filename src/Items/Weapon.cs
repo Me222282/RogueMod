@@ -94,7 +94,13 @@ namespace RogueMod
         
         public void Effect(ICharacter character, IRogue game)
         {
-            throw new NotImplementedException();
+            if (game.Player.Backpack.Wielding is not Weapon w) { return; }
+            
+            if (!(WeaponType == WeaponType.Arrow && w.WeaponType == WeaponType.ShortBow) &&
+                !(WeaponType == WeaponType.Bolt && w.WeaponType == WeaponType.CrossBow))
+            { return; }
+            
+            character.Damage(w, true);
         }
         
         public static Weapon Create(WeaponType weapon)

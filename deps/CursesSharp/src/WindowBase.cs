@@ -522,6 +522,12 @@ namespace CursesSharp
             
             return (char)c.Chars[0];
         }
+        public unsafe uint ReadOutputAttr(int y, int x)
+        {
+            CChar c = CursesMethods.mvwinwch(this.winptr, y, x);
+            
+            return c.Attribute;
+        }
 
         public uint[] ReadOutputChars(int n)
         {

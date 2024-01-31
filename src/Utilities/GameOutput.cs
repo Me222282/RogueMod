@@ -271,6 +271,7 @@ namespace RogueMod
             }
             
             public char Read(int x, int y) => _map[y, x].Character;
+            public Attribute ReadAttribute(int x, int y) => _map[y, x].Attribute;
             public Unit ReadUnit(int x, int y) => _map[y, x];
             //public Attribute GetAttribute(int x, int y) => _map[y, x].Attribute;
             

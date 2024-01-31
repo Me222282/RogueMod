@@ -37,6 +37,7 @@ namespace RogueMod
         bool IEntity.Character => true;
         public Vector2I Position { get; set; }
         
-        public void Action(Rogue game);
+        public void Action(IRogue game);
+        public void Damage(IItem source, bool thrown);
     }
 }
