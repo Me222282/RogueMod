@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -34,6 +35,11 @@ namespace RogueMod
             {
                 Node item = _first;
                 int end = char.ToLower(select) - 'a';
+                
+                if (end < 1 || end > Length)
+                {
+                    throw new IndexOutOfRangeException();
+                }
                 
                 for (int i = 0; i < end; i++)
                 {

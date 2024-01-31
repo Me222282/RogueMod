@@ -7,7 +7,7 @@ namespace RogueMod
     {
         public Vector2I Size { get; } = (80, 25);
         public int CurtainTime { get; } = 1500;
-        public int ThrowTime { get; } = 1500 / 25;
+        public int ThrowTime { get; } = 55;
         
         public int StartingHP { get; } = 12;
         public int StartingStrength { get; } = 16;

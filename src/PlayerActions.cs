@@ -23,8 +23,8 @@ namespace RogueMod
         public void Drop()
         {
             IItem item = SelectItem(ItemType.Any);
-            IItem drop = item.Copy();
             if (item is null) { return; }
+            IItem drop = item.Copy();
             if (item is Weapon && item.Stackable)
             {
                 _game.Player.Backpack.DropAll(item);
@@ -51,7 +51,7 @@ namespace RogueMod
                 w.MakeKnown(_game.Discoveries);
                 _message.Push($"You are now wearing {w.ToString(_game.Discoveries, false)}");
             }
-            catch (Exception) { }
+            catch (IndexOutOfRangeException) { }
         }
         public void Wield()
         {
@@ -68,7 +68,7 @@ namespace RogueMod
                 IItem w = _game.Player.Backpack.Wielding;
                 _message.Push($"You are now wielding {w.ToString(_game.Discoveries, false)} ({wield})");
             }
-            catch (Exception) { }
+            catch (IndexOutOfRangeException) { }
         }
         public void TakeOff()
         {
@@ -101,7 +101,7 @@ namespace RogueMod
             {
                 select = _game.Player.Backpack[wear];
             }
-            catch (Exception) { return; }
+            catch (IndexOutOfRangeException) { return; }
             
             if (select == _game.Player.Backpack.LeftRing ||
                 select == _game.Player.Backpack.RightRing)
@@ -182,7 +182,7 @@ namespace RogueMod
             {
                 item = _game.Player.Backpack[th];
             }
-            catch (Exception) { }
+            catch (IndexOutOfRangeException) { }
             if (item is null) { return; }
             
             Vector2I offset = ((Direction)ch).GetOffset();
@@ -190,8 +190,9 @@ namespace RogueMod
             ICharacter hit = _game.EntityManager.GetHitCast(_game.Player.Position + offset, (Direction)ch, hitPos);
             if (hit is not null)
             {
-                hitPos = hit.Position - offset;
+                hitPos = hit.Position;
             }
+            hitPos -= offset;
             
             _game.Player.Backpack.DropOne(item);
             char graphic = item.Graphic;
@@ -200,9 +201,15 @@ namespace RogueMod
             _output.Animate(_game.Player.Position + offset + (0, 1), hitPos + (0, 1),
                 graphic, Attribute.GetAttribute((Draw)graphic));
             
-            if (hit is null) { return; }
+            if (hit is not null)
+            {
+                hit.Damage(item, true);
+                return;
+            }
             
-            hit.Damage(item, true);
+            // If it cant place it, then who cares, player misses out
+            _game.EntityManager.Place(hitPos, item.Copy());
+            _game.EntityManager.Render(new RectangleI(hitPos, Vector2I.One), _game.Out[1]);
         }
         
         public IItem SelectItem(ItemType type)
@@ -215,7 +222,7 @@ namespace RogueMod
             {
                 item = _game.Player.Backpack[c];
             }
-            catch (Exception) { }
+            catch (IndexOutOfRangeException) { }
             
             if (item is null || (type != ItemType.Any && item.Type != type))
             {
@@ -254,7 +261,7 @@ namespace RogueMod
             if (_game.Player.Backpack.IsEmpty)
             {
                 _message.Push("You are empty handed");
-                return ' ';
+                return '\0';
             }
             
             int c = 0;
@@ -265,7 +272,7 @@ namespace RogueMod
             if (list.IsNullFull())
             {
                 _message.Push("You don't have anything appropriate");
-                return ' ';
+                return '\0';
             }
             
             _output.Clear();
@@ -273,7 +280,9 @@ namespace RogueMod
             _game.Out.PrintAll();
             Message.Clear();
             
-            return c == ' ' || c == Keys.ESC ? ' ' : (char)c;
+            if (!list.Exists(s => s != null && s[0] == c)) { return '\0'; }
+            
+            return c == ' ' || c == Keys.ESC ? '\0' : (char)c;
         }
     }
 }
