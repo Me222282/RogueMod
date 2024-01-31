@@ -145,23 +145,6 @@ namespace RogueMod
             }
         }
         
-        public void RenderBoxD(int x, int y, int w, int h)
-        {
-            Screen.Attr = Attribute.Brown.Value;
-            Screen.Move(y, x);
-            Screen.AddW((char)Draw.WallTL);
-            RenderLineH(x + 1, y, (char)Draw.WallH, w - 2, Attribute.Brown);
-            Screen.AddW((char)Draw.WallTR);
-            RenderLineV(x, y + 1, (char)Draw.WallV, h - 2, Attribute.Brown);
-            RenderLineV(x + w - 1, y + 1, (char)Draw.WallV, h - 2, Attribute.Brown);
-            Screen.Move(y + h - 1, x);
-            Screen.AddW((char)Draw.WallBL);
-            RenderLineH(x + 1, y + h - 1, (char)Draw.WallH, w - 2, Attribute.Brown);
-            Screen.AddW((char)Draw.WallBR);
-        }
-        public void RenderBoxD(RectangleI bounds)
-            => RenderBoxD(bounds.X, bounds.Y, bounds.Width, bounds.Height);
-
         public void RenderLineV(int x, int y, char c, int n, Attribute attribute)
         {
             Screen.Attr = attribute.Value;

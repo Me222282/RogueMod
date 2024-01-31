@@ -117,6 +117,19 @@ namespace RogueMod
             ouput.RenderLineH(x + 1, y + h - 1, '─', w - 2, Attribute.Green);
             ouput.Append('┘', Attribute.Green);
         }
+        public static void RenderBoxD(this IOutput output, int x, int y, int w, int h)
+        {
+            output.Write(x, y, (char)Draw.WallTL, Attribute.Brown);
+            output.RenderLineH(x + 1, y, (char)Draw.WallH, w - 2, Attribute.Brown);
+            output.Write(x + w - 1, y, (char)Draw.WallTR, Attribute.Brown);
+            output.RenderLineV(x, y + 1, (char)Draw.WallV, h - 2, Attribute.Brown);
+            output.RenderLineV(x + w - 1, y + 1, (char)Draw.WallV, h - 2, Attribute.Brown);
+            output.Write(x, y + h - 1, (char)Draw.WallBL, Attribute.Brown);
+            output.RenderLineH(x + 1, y + h - 1, (char)Draw.WallH, w - 2, Attribute.Brown);
+            output.Write(x + w - 1, y + h - 1, (char)Draw.WallBR, Attribute.Brown);
+        }
+        public static void RenderBoxD(this IOutput output, RectangleI bounds)
+            => RenderBoxD(output, bounds.X, bounds.Y, bounds.Width, bounds.Height);
         public static int PrintList(this IOutput output, string[] list, bool vertical, Func<int, bool> exit = null)
         {
             if (exit is null)

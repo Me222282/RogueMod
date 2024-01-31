@@ -16,8 +16,6 @@ namespace RogueMod
         public void Append(char c, Attribute attribute = new Attribute());
         public void Append(ReadOnlySpan<char> str, Attribute attribute = new Attribute());
         
-        public void RenderBoxD(int x, int y, int w, int h);
-        public void RenderBoxD(RectangleI bounds);
         public void RenderLineV(int x, int y, char c, int n, Attribute attribute = new Attribute());
         public void RenderLineH(int x, int y, char c, int n, Attribute attribute = new Attribute());
         
