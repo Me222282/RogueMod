@@ -38,27 +38,12 @@ namespace RogueMod
             scr.Fill(InnerBounds, (char)Draw.Floor);
         }
         
-        public Vector2I GetDoor(int index)
-        {
-            Door d = Doors[index];
-            int x = 0;
-            int y = 0;
-            if (d.Vertical)
-            {
-                y = d.Location;
-            }
-            else
-            {
-                x = d.Location;
-            }
-            return Bounds.Location + (x, y);
-        }
         public int GetDoor(int x, int y)
         {
             Vector2I v = (x, y);
             for (int i = 0; i < Doors.Length; i++)
             {
-                if (GetDoor(i) != v) { continue; }
+                if (Doors[i].GetLocation(this) != v) { continue; }
                 return i;
             }
             

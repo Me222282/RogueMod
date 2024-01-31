@@ -14,6 +14,11 @@ namespace RogueMod
         public int BackpackSize { get; } = 23;
         public int StomachSize { get; } = 100;
         public string Fruit { get; } = "slime mold";
+        
+        public int MaxRooms { get; } = 9;
+        public int MinRooms { get; } = 5;
+        public int DoorLockedProb { get; } = 10;
+        public int DoorHiddenProb { get; } = 7;
     }
     
     public class Controls

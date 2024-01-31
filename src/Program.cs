@@ -140,6 +140,15 @@ namespace RogueMod
                     room.Dark = false;
                     ((Rogue)Game).Eluminate(room);
                     return;
+                case 'S':
+                    for (int x = 0; x < Game.PlayingSize.X; x++)
+                    {
+                        for (int y = 0; y < Game.PlayingSize.Y; y++)
+                        {
+                            Game.Out[x, y] = true;
+                        }   
+                    }
+                    return;
             }
         }
         

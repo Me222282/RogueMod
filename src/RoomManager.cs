@@ -71,43 +71,42 @@ namespace RogueMod
         public IRoom[] Rooms { get; private set; }
         public ICorridorManager CorridorManager { get; private set; }
 
-        public int Level => throw new NotImplementedException();
-
+        public int Level { get; private set; }
+        
+        private int _sqareRoot;
+        private int _hiddenDoors;
+        private int _lockedDoors;
         public void GenerateRooms(int level, IRogue game)
         {
-            Rooms = new Room[]
-            {
-                new Room(new RectangleI(2, 2, 60, 20), true,
-                    new Door[] { new Door(4, false, false, true), new Door(3, true) })
-            };
-            CorridorManager = new CorridorManager(new Corridor[]
-            {
-                new Corridor((6, 0), (6, 1)),
-                new Corridor((6, 0), (0, 0)),
-                new Corridor((0, 0), (0, 5)),
-                new Corridor((0, 5), (1, 5))
-            });
+            Level = level;
+            _sqareRoot = (int)Math.Sqrt(Program.Properties.MaxRooms);
+            _lockedDoors = 0;
+            _hiddenDoors = 0;
             
-            IRoom room = Rooms[0];
-            game.EntityManager.Place(game.GetRandomPosition(room), Ring.Create());
-            game.EntityManager.Place(game.GetRandomPosition(room), Ring.Create());
-            game.EntityManager.Place(game.GetRandomPosition(room), Scroll.Create());
-            game.EntityManager.Place(game.GetRandomPosition(room), Scroll.Create());
-            game.EntityManager.Place(game.GetRandomPosition(room), Staff.Create(game));
-            game.EntityManager.Place(game.GetRandomPosition(room), Staff.Create(game));
-            game.EntityManager.Place(game.GetRandomPosition(room), Potion.Create());
-            game.EntityManager.Place(game.GetRandomPosition(room), Potion.Create());
-            game.EntityManager.Place(game.GetRandomPosition(room), new Gold(100));
-            game.EntityManager.Place(game.GetRandomPosition(room), new Gold(30));
-            game.EntityManager.Place(game.GetRandomPosition(room), Food.Create());
-            game.EntityManager.Place(game.GetRandomPosition(room), Food.Create());
-            game.EntityManager.Place(game.GetRandomPosition(room), Weapon.Create());
-            game.EntityManager.Place(game.GetRandomPosition(room), Weapon.Create());
-            game.EntityManager.Place(game.GetRandomPosition(room), Armour.Create());
-            game.EntityManager.Place(game.GetRandomPosition(room), Armour.Create());
-            game.EntityManager.Place(game.GetRandomPosition(room), new Key());
-            game.EntityManager.Place(game.GetRandomPosition(room), new Key());
-            game.EntityManager.Place(game.GetRandomPosition(room), new Amulet());
+            Rooms = new Room[
+                Program.RNG.Next(
+                    Program.Properties.MinRooms,
+                    Program.Properties.MaxRooms)];
+            
+            int[] offsets = new int[Rooms.Length];
+            int count = Program.Properties.MaxRooms - Rooms.Length;
+            int current = 0;
+            for (int i = 0; i < offsets.Length; i++)
+            {
+                bool should = (Program.RNG.Next(3) == 0 || i + count >= offsets.Length) && count > 0;
+                if (should)
+                {
+                    count--;
+                    current++;
+                }
+                offsets[i] = current;
+            }
+            for (int i = 0; i < Rooms.Length; i++)
+            {
+                Rooms[i] = GenerateRoom(i + offsets[i], level, game);
+            }
+            
+            CorridorManager = new CorridorManager(new Corridor[0]);
             
             FillMapC();
             
@@ -115,6 +114,52 @@ namespace RogueMod
             {
                 FillMap(i);
             }
+        }
+        public Room GenerateRoom(int index, int level, IRogue game)
+        {            
+            bool dark = Program.RNG.Next(10) < level;
+            Vector2I ms = game.PlayingSize / _sqareRoot;
+            RectangleI bounds = new RectangleI();
+            Vector2I top = (index % _sqareRoot, index / _sqareRoot) * ms;
+            top.X += 1;
+            
+            do
+            {
+                bounds.Width = Program.RNG.Next(ms.X - 4) + 4;
+                bounds.Height = Program.RNG.Next(ms.Y - 4) + 4;
+                bounds.X = top.X + Program.RNG.Next(ms.X - bounds.Width);
+                bounds.Y = top.Y + Program.RNG.Next(ms.Y - bounds.Height);
+            } while (bounds.Y == 0);
+            
+            int perimeter = bounds.Width * 2 + bounds.Height * 2 - 8;
+            
+            Door[] doors = new Door[Program.RNG.Next(perimeter / 8) + 1];
+            for (int i = 0; i < doors.Length; i++)
+            {
+                int p;
+                ReadOnlySpan<Door> previous = new ReadOnlySpan<Door>(doors, 0, i);
+                
+                do
+                {
+                    p = Program.RNG.Next(perimeter);
+                } while (previous.Exists(d => d.PerimeterIndex == p));
+                bool locked = false;
+                bool hidden = false;
+                if (Program.RNG.Next(Program.Properties.DoorLockedProb) == 0)
+                {
+                    locked = true;
+                    _lockedDoors++;
+                }
+                if (Program.RNG.Next(Program.Properties.DoorHiddenProb) == 0)
+                {
+                    hidden = true;
+                    _hiddenDoors++;
+                }
+                
+                doors[i] = new Door(p, hidden, locked);
+            }
+            
+            return new Room(bounds, dark, doors);
         }
         private void FillMap(int roomIndex)
         {

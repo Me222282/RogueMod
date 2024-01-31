@@ -19,7 +19,7 @@ namespace RogueMod
         }
         public int Quantity { get; set; }
         public bool Stackable => true;
-        public int Value => 10;
+        public int Value => 1;
         
         char IEntity.Graphic => (char)Draw.Gold;
         
@@ -29,5 +29,10 @@ namespace RogueMod
         public void MakeKnown(Discoveries dics) => throw new NotSupportedException();
         public string ToString(Discoveries dics, bool plural) => throw new NotSupportedException();
         public IItem Copy() => throw new NotSupportedException();
+        
+        public static Gold Create(int level)
+        {
+            return new Gold(Program.RNG.Next(50 + (10 * level)) + level);
+        }
     }
 }

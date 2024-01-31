@@ -37,6 +37,15 @@ namespace RogueMod
             }
             return false;
         }
+        public static bool Exists<T>(this ReadOnlySpan<T> e, Predicate<T> test)
+        {
+            foreach (T t in e)
+            {
+                if (!test(t)) { continue; }
+                return true;
+            }
+            return false;
+        }
         public static void Fill<T>(this T[,] array, T value)
         {
             int w = array.GetLength(1);
