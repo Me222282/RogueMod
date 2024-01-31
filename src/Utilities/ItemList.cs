@@ -36,7 +36,7 @@ namespace RogueMod
                 Node item = _first;
                 int end = char.ToLower(select) - 'a';
                 
-                if (end < 1 || end > Length)
+                if (end < 0 || end > Length)
                 {
                     throw new IndexOutOfRangeException();
                 }
